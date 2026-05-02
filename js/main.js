@@ -1,168 +1,161 @@
 (function () {
   "use strict";
 
-  var root = document.getElementById("carousel-pills");
-  var track = document.getElementById("pills-track");
-  var viewport = root ? root.querySelector(".carousel__viewport") : null;
-  var prevBtn = root ? root.querySelector(".carousel__btn--prev") : null;
-  var nextBtn = root ? root.querySelector(".carousel__btn--next") : null;
-  var dotsContainer = root ? root.querySelector(".carousel__dots") : null;
-  var slides = track
-    ? Array.prototype.slice.call(track.querySelectorAll(".carousel__slide"))
-    : [];
-  var total = slides.length;
-  var index = 0;
+  /* ==========================================================================
+   * Carrossel — Pílulas mais acessadas (index)
+   * Rola o viewport horizontalmente ao clicar nas setas; largura do passo = 1 slide + gap.
+   * ========================================================================== */
+  var carouselViewport = document.getElementById("pill-carousel-viewport");
+  var carouselPrev = document.getElementById("pill-carousel-prev");
+  var carouselNext = document.getElementById("pill-carousel-next");
+  var carouselTrack = document.getElementById("pill-carousel-track");
 
-  function setActive(i) {
-    index = Math.max(0, Math.min(total - 1, i));
-    slides.forEach(function (s, j) {
-      s.classList.toggle("is-active", j === index);
+  function getCarouselStepPx() {
+    if (!carouselTrack) return 300;
+    var slide = carouselTrack.querySelector(".pill-carousel__slide");
+    if (!slide) return 300;
+    var styles = window.getComputedStyle(carouselTrack);
+    var gap = parseFloat(styles.columnGap || styles.gap) || 16;
+    return slide.offsetWidth + gap;
+  }
+
+  function scrollCarousel(delta) {
+    if (!carouselViewport) return;
+    carouselViewport.scrollBy({ left: delta, behavior: "smooth" });
+  }
+
+  if (carouselViewport && carouselPrev && carouselNext) {
+    carouselPrev.addEventListener("click", function () {
+      scrollCarousel(-getCarouselStepPx());
     });
-    if (!dotsContainer) return;
-    var dots = dotsContainer.querySelectorAll(".carousel__dot");
-    dots.forEach(function (d, j) {
-      d.setAttribute("aria-selected", j === index ? "true" : "false");
-      d.tabIndex = j === index ? 0 : -1;
+    carouselNext.addEventListener("click", function () {
+      scrollCarousel(getCarouselStepPx());
     });
   }
 
-  function scrollToIndex(i) {
-    var el = slides[i];
-    if (!el || !viewport) return;
-    var maxScroll = viewport.scrollWidth - viewport.clientWidth;
-    var target =
-      el.offsetLeft - (viewport.clientWidth - el.offsetWidth) / 2;
-    if (target < 0) target = 0;
-    if (target > maxScroll) target = maxScroll;
-    viewport.scrollTo({ left: target, behavior: "smooth" });
-    setActive(i);
-  }
+  /* ==========================================================================
+   * Animações de entrada — fade-in ao entrar no viewport
+   * ========================================================================== */
+  var revealSections = document.querySelectorAll(".section-reveal");
 
-  function nearestIndex() {
-    if (!viewport || !slides.length) return 0;
-    var mid = viewport.scrollLeft + viewport.clientWidth / 2;
-    var best = 0;
-    var bestDist = Infinity;
-    slides.forEach(function (s, j) {
-      var c = s.offsetLeft + s.offsetWidth / 2;
-      var d = Math.abs(c - mid);
-      if (d < bestDist) {
-        bestDist = d;
-        best = j;
-      }
-    });
-    return best;
-  }
+  function initReveal() {
+    if (!revealSections.length) return;
 
-  if (total && dotsContainer) {
-    slides.forEach(function (_, i) {
-      var dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "carousel__dot";
-      dot.setAttribute("role", "tab");
-      dot.setAttribute("aria-label", "Slide " + (i + 1));
-      dot.addEventListener("click", function () {
-        scrollToIndex(i);
+    if (!("IntersectionObserver" in window)) {
+      revealSections.forEach(function (el) {
+        el.classList.add("is-visible");
       });
-      dotsContainer.appendChild(dot);
-    });
-
-    if (prevBtn) {
-      prevBtn.addEventListener("click", function () {
-        scrollToIndex(index - 1 < 0 ? total - 1 : index - 1);
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener("click", function () {
-        scrollToIndex(index + 1 >= total ? 0 : index + 1);
-      });
+      return;
     }
 
-    var scrollTimer;
-    viewport.addEventListener(
-      "scroll",
-      function () {
-        window.clearTimeout(scrollTimer);
-        scrollTimer = window.setTimeout(function () {
-          setActive(nearestIndex());
-        }, 80);
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        });
       },
-      { passive: true }
+      { threshold: 0.12, rootMargin: "0px 0px -24px 0px" }
     );
 
-    setActive(0);
-  }
-
-  document.querySelectorAll(".pill").forEach(function (pill) {
-    pill.addEventListener("click", function () {
-      var input = document.getElementById("chat-input");
-      if (input) input.value = pill.textContent.trim();
-    });
-  });
-
-  /* Assistente — botão canto + painel */
-  var panel = document.getElementById("assistant-panel");
-  var toggle = document.getElementById("assistant-toggle");
-  var closeBtn = document.getElementById("assistant-close");
-  var chatInput = document.getElementById("chat-input");
-
-  function setAssistantOpen(open) {
-    if (!panel || !toggle) return;
-    if (open) {
-      panel.removeAttribute("hidden");
-      toggle.setAttribute("aria-expanded", "true");
-      window.setTimeout(function () {
-        if (chatInput) chatInput.focus();
-      }, 50);
-    } else {
-      panel.setAttribute("hidden", "hidden");
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.focus();
-    }
-  }
-
-  if (toggle && panel) {
-    toggle.addEventListener("click", function () {
-      var open = panel.hasAttribute("hidden");
-      setAssistantOpen(open);
+    revealSections.forEach(function (el) {
+      observer.observe(el);
     });
   }
 
-  if (closeBtn) {
-    closeBtn.addEventListener("click", function () {
-      setAssistantOpen(false);
+  initReveal();
+
+  /* ==========================================================================
+   * Formulário da Lume (index) — evita envio em página estática
+   * ========================================================================== */
+  var lumeSearchForm = document.getElementById("lume-search-form");
+  if (lumeSearchForm) {
+    lumeSearchForm.addEventListener("submit", function (e) {
+      e.preventDefault();
     });
   }
 
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && panel && !panel.hasAttribute("hidden")) {
-      setAssistantOpen(false);
-    }
-  });
+  /* ==========================================================================
+   * Dual Guide — abas (página pilulaOneDrive)
+   * ========================================================================== */
+  var tabButtons = document.querySelectorAll(".tab-switcher__btn[data-tab]");
+  var panelPassos = document.getElementById("panel-passos");
+  var panelDetalhe = document.getElementById("panel-detalhe");
 
-  window.addEventListener("resize", function () {
-    if (viewport && track) {
-      window.requestAnimationFrame(function () {
-        if (typeof nearestIndex === "function") setActive(nearestIndex());
-      });
-    }
-  });
+  function setActiveTab(tabName) {
+    tabButtons.forEach(function (btn) {
+      var name = btn.getAttribute("data-tab");
+      var isActive = name === tabName;
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-selected", isActive ? "true" : "false");
+      btn.tabIndex = isActive ? 0 : -1;
+    });
 
-  /* Ver todas — dúvidas extras */
-  var verTodas = document.getElementById("faq-ver-todas");
-  var faqExtra = document.getElementById("faq-all-extra");
-  if (verTodas && faqExtra) {
-    verTodas.addEventListener("click", function () {
-      var aberto = !faqExtra.hasAttribute("hidden");
-      if (aberto) {
-        faqExtra.setAttribute("hidden", "hidden");
-        verTodas.setAttribute("aria-expanded", "false");
-        verTodas.textContent = "Ver todas";
+    if (panelPassos && panelDetalhe) {
+      if (tabName === "passos") {
+        panelPassos.removeAttribute("hidden");
+        panelDetalhe.setAttribute("hidden", "hidden");
       } else {
-        faqExtra.removeAttribute("hidden");
-        verTodas.setAttribute("aria-expanded", "true");
-        verTodas.textContent = "Ver menos";
-        faqExtra.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        panelDetalhe.removeAttribute("hidden");
+        panelPassos.setAttribute("hidden", "hidden");
+      }
+    }
+  }
+
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var name = btn.getAttribute("data-tab");
+      if (name) setActiveTab(name);
+    });
+  });
+
+  /* ==========================================================================
+   * Lume — troca de imagem (mao-abaixada / mao-levantada ou data-src-*)
+   * ========================================================================== */
+  var lumeImg = document.getElementById("lume-mascot");
+  var lumeSpeech = document.getElementById("lume-speech");
+
+  var srcDown =
+    (lumeImg && lumeImg.getAttribute("data-src-down")) ||
+    (lumeImg && lumeImg.getAttribute("src")) ||
+    "mao-abaixada.png";
+  var srcUp =
+    (lumeImg && lumeImg.getAttribute("data-src-up")) || "mao-levantada.png";
+
+  function lumeActivate() {
+    if (!lumeImg) return;
+    lumeImg.src = srcUp;
+    if (lumeSpeech) {
+      lumeSpeech.removeAttribute("hidden");
+    }
+  }
+
+  function lumeDeactivate() {
+    if (!lumeImg) return;
+    lumeImg.src = srcDown;
+    if (lumeSpeech) {
+      lumeSpeech.setAttribute("hidden", "hidden");
+    }
+  }
+
+  if (lumeImg) {
+    lumeImg.addEventListener("mouseenter", lumeActivate);
+    lumeImg.addEventListener("mouseleave", lumeDeactivate);
+    lumeImg.addEventListener("mousedown", lumeActivate);
+    lumeImg.addEventListener("touchstart", function (e) {
+      lumeActivate();
+      e.preventDefault();
+    }, { passive: false });
+    lumeImg.addEventListener("touchend", function () {
+      window.setTimeout(lumeDeactivate, 450);
+    });
+    lumeImg.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        lumeActivate();
+        window.setTimeout(lumeDeactivate, 1400);
       }
     });
   }

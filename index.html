@@ -3,278 +3,165 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="HelpProf — ferramentas e apoio para professores da rede pública." />
-  <title>HelpProf — Apoio ao professor</title>
+  <meta name="description" content="HelpProf — suporte rápido, pílulas e ferramentas para professores da rede pública." />
+  <title>HelpProf — Início</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
 
+  <!-- 1. Header -->
   <header class="site-header" role="banner">
     <div class="wrap site-header__inner">
-      <a href="/" class="brand" aria-label="HelpProf — início">
-        <img class="brand__logo" src="Logo.jpeg" width="200" height="72" alt="HelpProf" decoding="async" />
+      <a href="#inicio" class="brand" aria-label="HelpProf — início">
+        <span class="brand__text"><span class="brand__help">Help</span><span class="brand__prof">Prof</span></span>
       </a>
-      <p class="site-header__tagline">Apoio leve para o seu dia a dia na escola</p>
+      <nav class="site-nav" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="#inicio">Início</a></li>
+          <li><a class="site-nav__link" href="#perguntas-recentes">Perguntas Recentes</a></li>
+          <li><a class="site-nav__link" href="#contato">Contato</a></li>
+        </ul>
+      </nav>
     </div>
   </header>
 
-
-  <main id="conteudo-principal" class="main main--with-dock">
-    <div class="wrap">
-      <h1 class="visually-hidden">HelpProf — Pílulas, dúvidas frequentes e assistente</h1>
-
-      <section class="pills-section" aria-labelledby="pills-title">
-        
-        <div class="pills-section__head">
-          <h2 id="pills-title" class="section-title">Últimas Pílulas de Sobrevivência <span class="section-title__sub">(2-min guides)</span></h2>
-          <div class="carousel__nav" aria-label="Navegação do carrossel">
-            <button type="button" class="carousel__btn carousel__btn--prev" aria-controls="pills-track" aria-label="Slide anterior">&lsaquo;</button>
-            <button type="button" class="carousel__btn carousel__btn--next" aria-controls="pills-track" aria-label="Próximo slide">&rsaquo;</button>
-          </div>
-        </div>
-        <div class="carousel" id="carousel-pills">
-          <div class="carousel__viewport" role="region" aria-roledescription="carrossel" aria-label="Guias rápidos em vídeo">
-            <ul class="carousel__track" id="pills-track">
-              <li class="carousel__slide is-active" data-index="0">
-                <article class="video-card video-card--featured">
-                  <div class="video-card__thumb video-card__thumb--pill video-card__thumb--drive">
-                    <img class="video-card__pill-icon" src="Drive.png" width="160" height="160" alt="" decoding="async" />
-                    <span class="video-card__badge" title="Resumo estilo podcast">Resumo áudio</span>
-                    <button type="button" class="video-card__play" aria-label="Reproduzir: Como Compartilhar Links do Google Drive">
-                      <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7L8 5z"/></svg>
-                    </button>
-                    <span class="video-card__podcast-icon" aria-hidden="true" title="NotebookLM podcast summary">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 9a3 3 0 016 0v6a3 3 0 11-6 0V9z" stroke="currentColor" stroke-width="1.5"/>
-                        <path d="M15 7v10M18 5v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      </svg>
-                    </span>
+  <main id="conteudo-principal" class="main main--home">
+    <div class="wrap main__inner">
+      <!-- 2. Destaques — carrossel de pílulas -->
+      <section id="inicio" class="hp-section section-reveal" aria-labelledby="destaques-title">
+        <h2 id="destaques-title" class="hp-section__title">Pílulas Mais Acessadas</h2>
+        <div class="pill-carousel" data-carousel>
+          <button type="button" class="pill-carousel__arrow pill-carousel__arrow--prev" id="pill-carousel-prev" aria-label="Pílulas anteriores">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="pill-carousel__viewport" id="pill-carousel-viewport" tabindex="0" role="region" aria-roledescription="carrossel" aria-label="Pílulas mais acessadas">
+            <ul class="pill-carousel__track" id="pill-carousel-track">
+              <li class="pill-carousel__slide">
+                <article class="pill-card glass-card">
+                  <div class="pill-card__icon pill-card__icon--doc" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                   </div>
-                  <h3 class="video-card__title">Como Compartilhar Links do Google Drive (Private Link)</h3>
-                  <p class="video-card__meta">Gravação de tela · ~2 min</p>
+                  <h3 class="pill-card__title">Como destravar o SED</h3>
+                  <p class="pill-card__meta">2 min</p>
                 </article>
               </li>
-              <li class="carousel__slide" data-index="1">
-                <article class="video-card">
-                  <div class="video-card__thumb video-card__thumb--pill video-card__thumb--excel">
-                    <img class="video-card__pill-icon" src="excel.png" width="160" height="160" alt="" decoding="async" />
-                    <button type="button" class="video-card__play" aria-label="Reproduzir: Planilha filtros sem medo">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
-                    </button>
+              <li class="pill-carousel__slide">
+                <a class="pill-card pill-card--link glass-card" href="pilulaOneDrive.html">
+                  <div class="pill-card__icon pill-card__icon--play" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7L8 5z" fill="currentColor"/></svg>
                   </div>
-                  <h3 class="video-card__title">Planilha: filtros sem medo</h3>
-                  <p class="video-card__meta">~2 min</p>
-                </article>
+                  <h3 class="pill-card__title">OneDrive: enviar documento</h3>
+                  <p class="pill-card__meta">2 min</p>
+                </a>
               </li>
-              <li class="carousel__slide" data-index="2">
-                <article class="video-card">
-                  <div class="video-card__thumb video-card__thumb--pill video-card__thumb--mail">
-                    <img class="video-card__pill-icon" src="email.png" width="160" height="160" alt="" decoding="async" />
-                    <button type="button" class="video-card__play" aria-label="Reproduzir: E-mail anexos e tamanho">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg>
-                    </button>
+              <li class="pill-carousel__slide">
+                <article class="pill-card glass-card">
+                  <div class="pill-card__icon pill-card__icon--doc" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
                   </div>
-                  <h3 class="video-card__title">E-mail: anexos e tamanho</h3>
-                  <p class="video-card__meta">~2 min</p>
+                  <h3 class="pill-card__title">Planilha: filtros sem medo</h3>
+                  <p class="pill-card__meta">2 min</p>
                 </article>
               </li>
             </ul>
           </div>
-          <div class="carousel__dots" role="tablist" aria-label="Slides"></div>
-        </div>
-      </section>
-
-      <section class="content-section faq-block" aria-labelledby="faq-mais-1">
-        <h2 id="faq-mais-1" class="content-section__title">Maiores dúvidas — arquivos e nuvem</h2>
-        <p class="content-section__lede">As dúvidas que mais aparecem quando o PEI pede tudo “para ontem”, com resposta direta.</p>
-        <div class="faq-accordion">
-          <details class="faq-item">
-            <summary class="faq-item__q">Perdi o arquivo do Guia de Aprendizagem: onde ele costuma estar?</summary>
-            <div class="faq-item__a">Procure primeiro no <strong>Drive</strong> (pasta da escola ou “Meu Drive”). Se baixou para o computador, abra <strong>Downloads</strong> e busque pelo nome da turma ou “PEI”. Se estava no e-mail, use a <strong>lupa</strong> do Gmail com o nome do estudante.</div>
-          </details>
-          <details class="faq-item">
-            <summary class="faq-item__q">O link do Drive abre “sem permissão” para a família ou para a coordenação</summary>
-            <div class="faq-item__a">Abra o arquivo, clique em <strong>Compartilhar</strong> e confira se o e-mail da pessoa está na lista com <strong>Leitor</strong> (só ver) ou <strong>Editor</strong> (se for trabalhar junto). Em material sensível do PEI, evite “qualquer pessoa com o link”.</div>
-          </details>
-          <details class="faq-item">
-            <summary class="faq-item__q">Preciso mandar a mesma planilha para vários colegas sem apagar dados uns dos outros</summary>
-            <div class="faq-item__a">Envie <strong>um arquivo no Drive</strong> com permissão de comentário ou leitura. Se cada um precisa de uma cópia própria (ex.: <strong>Tabela de Frequência</strong> por turma), use <strong>Arquivo &gt; Fazer uma cópia</strong> e oriente cada professor a preencher a própria.</div>
-          </details>
-        </div>
-      </section>
-
-      <section class="content-section tools-showcase" aria-labelledby="tools-showcase-title">
-        <h2 id="tools-showcase-title" class="content-section__title">Ferramentas que mais ajudam no PEI</h2>
-        <p class="content-section__lede">
-          No Ensino Integral, o que salva tempo é combinar poucas ferramentas certas: uma para guardar documentos, outra para números (frequência, notas) e outra para falar com escola e família sem perder o fio.
-        </p>
-        <ul class="tools-showcase__grid">
-          <li class="tool-tile">
-            <div class="tool-tile__icon tool-tile__icon--bob" aria-hidden="true">
-              <img src="Drive.png" width="48" height="48" alt="" decoding="async" />
-            </div>
-            <h3 class="tool-tile__name">Google Drive</h3>
-            <p class="tool-tile__txt">Guarde <strong>Guias de Aprendizagem</strong>, atas e PDFs numa pasta por turma. Menos “qual era o anexo?” no grupo.</p>
-          </li>
-          <li class="tool-tile">
-            <div class="tool-tile__icon tool-tile__icon--sway" aria-hidden="true">
-              <svg class="tool-tile__svg" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-                <path d="M14 2v6h6M8 13h8M8 17h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h3 class="tool-tile__name">Documentos Google</h3>
-            <p class="tool-tile__txt">Ótimo para <strong>Plano de Ação</strong> e texto colaborativo com a equipe — histórico de versões evita susto antes da reunião.</p>
-          </li>
-          <li class="tool-tile">
-            <div class="tool-tile__icon tool-tile__icon--bob tool-tile__icon--delay-1" aria-hidden="true">
-              <img src="excel.png" width="48" height="48" alt="" decoding="async" />
-            </div>
-            <h3 class="tool-tile__name">Excel / Planilhas</h3>
-            <p class="tool-tile__txt">Para <strong>Tabela de Frequência</strong>, notas bimestrais e listas — congele a 1ª linha e use filtros para achar aluno em segundos.</p>
-          </li>
-          <li class="tool-tile">
-            <div class="tool-tile__icon tool-tile__icon--sway tool-tile__icon--delay-2" aria-hidden="true">
-              <svg class="tool-tile__svg" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.4"/>
-                <path d="M8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-                <circle cx="17" cy="16" r="2" fill="currentColor" opacity="0.35"/>
-              </svg>
-            </div>
-            <h3 class="tool-tile__name">Google Forms</h3>
-            <p class="tool-tile__txt">Pesquisas rápidas com famílias, autorização de saída ou check-in de leitura — respostas já vão para uma planilha.</p>
-          </li>
-          <li class="tool-tile">
-            <div class="tool-tile__icon tool-tile__icon--bob tool-tile__icon--delay-3" aria-hidden="true">
-              <img src="email.png" width="48" height="48" alt="" decoding="async" />
-            </div>
-            <h3 class="tool-tile__name">E-mail institucional</h3>
-            <p class="tool-tile__txt">Canal oficial para coordenação e registros. Combine assunto padrão: <strong>Turma + assunto + data</strong>.</p>
-          </li>
-          <li class="tool-tile">
-            <div class="tool-tile__icon tool-tile__icon--pulse" aria-hidden="true">
-              <svg class="tool-tile__svg" width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                <path d="M4 19V5a2 2 0 012-2h12a2 2 0 012 2v14l-4-2-4 2-4-2-4 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-                <path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h3 class="tool-tile__name">Google Classroom</h3>
-            <p class="tool-tile__txt">Centraliza avisos e materiais por turma no integral — menos dispersão entre grupos de mensagem.</p>
-          </li>
-        </ul>
-      </section>
-
-      <section class="content-section faq-block" aria-labelledby="faq-mais-2">
-        <h2 id="faq-mais-2" class="content-section__title">Maiores dúvidas — planilhas e e-mail</h2>
-        <p class="content-section__lede">Quando a planilha “quebra” ou o e-mail não sai, costuma ser um destes pontos.</p>
-        <div class="faq-accordion">
-          <details class="faq-item">
-            <summary class="faq-item__q">Congelei a linha errada na planilha de frequência e agora não consigo rolar direito</summary>
-            <div class="faq-item__a">No Excel ou Planilhas Google: menu <strong>Exibir</strong> (ou <strong>Ver</strong>) &gt; <strong>Congelar</strong> &gt; <strong>Descongelar</strong>. Depois selecione a linha <strong>abaixo</strong> do cabeçalho e use <strong>Congelar primeira linha</strong> de novo.</div>
-          </details>
-          <details class="faq-item">
-            <summary class="faq-item__q">O e-mail volta dizendo que o anexo é grande demais</summary>
-            <div class="faq-item__a">Envie o arquivo pelo <strong>Drive</strong> (link restrito) em vez de anexar. No corpo do e-mail, explique: “Material do PEI — link seguro da escola”.</div>
-          </details>
-          <details class="faq-item">
-            <summary class="faq-item__q">Duplicou nome na lista e a frequência ficou errada</summary>
-            <div class="faq-item__a">Use <strong>Remover duplicatas</strong> (Excel) ou <strong>Dados &gt; Remover duplicatas</strong> (Planilhas) na coluna do nome. <strong>Atenção:</strong> faça uma cópia da planilha antes, por segurança.</div>
-          </details>
-        </div>
-      </section>
-
-      <section class="content-section faq-all" aria-labelledby="faq-all-title">
-        <div class="faq-all__head">
-          <h2 id="faq-all-title" class="content-section__title">Todas as dúvidas</h2>
-          <button type="button" class="btn-ver-todas" id="faq-ver-todas" aria-expanded="false" aria-controls="faq-all-extra">
-            Ver todas
+          <button type="button" class="pill-carousel__arrow pill-carousel__arrow--next" id="pill-carousel-next" aria-label="Próximas pílulas">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
-        <p class="content-section__lede">Lista rápida para escanear. Toque em <strong>Ver todas</strong> para abrir o restante.</p>
-        <ul class="faq-all__list" id="faq-all-list">
-          <li>Como recuperar senha do e-mail da escola?</li>
-          <li>O que fazer quando o PDF do PEI não imprime direito?</li>
-          <li>Como juntar vários arquivos num só PDF sem programa pago?</li>
-          <li>Planilha: como travar só algumas células (notas) para alunos não apagarem fórmulas?</li>
-          <li>Drive: como saber quem já abriu o arquivo (quando a escola permite)?</li>
+      </section>
+
+      <!-- 3. Ferramentas didáticas -->
+      <section id="perguntas-recentes" class="hp-section section-reveal" aria-labelledby="sala-title">
+        <h2 id="sala-title" class="hp-section__title">Para a Sala de Aula</h2>
+        <ul class="classroom-grid">
+          <li>
+            <article class="classroom-card classroom-card--kahoot glass-card">
+              <div class="classroom-card__icon" aria-hidden="true">K</div>
+              <h3 class="classroom-card__name">Kahoot</h3>
+              <p class="classroom-card__desc">Quizzes ao vivo para engajar turmas grandes com feedback imediato e ritmo leve.</p>
+            </article>
+          </li>
+          <li>
+            <article class="classroom-card classroom-card--viz3d glass-card">
+              <div class="classroom-card__icon" aria-hidden="true">3D</div>
+              <h3 class="classroom-card__name">Visualizador 3D</h3>
+              <p class="classroom-card__desc">Explore estruturas em ciências e biologia com modelos que ganham profundidade na lousa digital.</p>
+            </article>
+          </li>
+          <li>
+            <article class="classroom-card classroom-card--repo glass-card">
+              <div class="classroom-card__icon" aria-hidden="true">R</div>
+              <h3 class="classroom-card__name">Repositório de Aulas</h3>
+              <p class="classroom-card__desc">Organize sequências didáticas e materiais por turma para achar tudo em um só lugar.</p>
+            </article>
+          </li>
         </ul>
-        <div class="faq-all__extra" id="faq-all-extra" hidden>
-          <ul class="faq-all__list faq-all__list--continued">
-            <li>Excel: atalho para colar só valores (sem bagunçar formatação)</li>
-            <li>Como organizar pastas do Drive por bimestre sem virar “pastinha dentro de pastinha”?</li>
-            <li>Gmail: criar rascunho com o mesmo assunto toda semana (reunião de equipe)</li>
-            <li>Planilhas Google: aviso quando alguém altera a Tabela de Frequência</li>
-            <li>Como exportar notas da planilha para um relatório simples para a coordenação?</li>
-            <li>Drive em celular: baixar arquivo para mostrar offline na aula</li>
-            <li>O que colocar no assunto do e-mail quando for documentação do PEI?</li>
-            <li>Como compartilhar pasta só com quem tem e-mail @escola?</li>
-          </ul>
+      </section>
+
+      <!-- 4. Filtros operacionais -->
+      <section id="acesso-rapido" class="hp-section section-reveal" aria-labelledby="quick-access-title">
+        <h2 id="quick-access-title" class="hp-section__title">Acesso Rápido por Ferramenta</h2>
+        <ul class="quick-access-grid">
+          <li><a class="quick-access-btn" href="#" aria-label="OneDrive"><span class="quick-access-btn__glyph">OD</span><span class="quick-access-btn__label">OneDrive</span></a></li>
+          <li><a class="quick-access-btn" href="#" aria-label="WhatsApp Web"><span class="quick-access-btn__glyph">WA</span><span class="quick-access-btn__label">WhatsApp Web</span></a></li>
+          <li><a class="quick-access-btn" href="#" aria-label="Word"><span class="quick-access-btn__glyph">W</span><span class="quick-access-btn__label">Word</span></a></li>
+          <li><a class="quick-access-btn" href="#" aria-label="Excel"><span class="quick-access-btn__glyph">X</span><span class="quick-access-btn__label">Excel</span></a></li>
+          <li><a class="quick-access-btn" href="#" aria-label="Canva"><span class="quick-access-btn__glyph">C</span><span class="quick-access-btn__label">Canva</span></a></li>
+          <li><a class="quick-access-btn" href="#" aria-label="SED"><span class="quick-access-btn__glyph">SED</span><span class="quick-access-btn__label">SED</span></a></li>
+          <li><a class="quick-access-btn" href="#" aria-label="CMSP"><span class="quick-access-btn__glyph">CM</span><span class="quick-access-btn__label">CMSP</span></a></li>
+        </ul>
+      </section>
+
+      <!-- 5. Busca / IA Lume -->
+      <section id="busca-lume" class="hp-section hp-section--lume section-reveal" aria-labelledby="lume-hero-title">
+        <div class="lume-footer-hero glass-card glass-card--intense">
+          <h2 id="lume-hero-title" class="lume-footer-hero__title">Não achou o que precisava? A Lume te guia!</h2>
+          <div class="lume-footer-hero__row">
+            <form class="lume-search" id="lume-search-form" role="search" action="#" method="get">
+              <label class="visually-hidden" for="lume-search-input">Descreva seu problema</label>
+              <input
+                id="lume-search-input"
+                class="lume-search__input"
+                type="search"
+                name="q"
+                autocomplete="off"
+                placeholder="Ex.: travou o SED, não abre o Word…"
+              />
+              <button type="submit" class="lume-search__submit">Buscar</button>
+            </form>
+            <img
+              id="lume-mascot"
+              class="lume-footer-hero__mascot"
+              src="Mao abaixada.png"
+              data-src-down="Mao abaixada.png"
+              data-src-up="Mao levantada.png"
+              width="140"
+              height="140"
+              alt="Lume, mascote coruja do HelpProf"
+              decoding="async"
+              tabindex="0"
+            />
+          </div>
+          <p class="lume-footer-hero__hint">Digite seu problema e nossa IA cria um guia de sobrevivência na hora.</p>
         </div>
       </section>
     </div>
   </main>
 
-  <footer class="site-footer" role="contentinfo">
+  <!-- 6. Rodapé -->
+  <footer id="contato" class="site-footer site-footer--split" role="contentinfo">
     <div class="wrap site-footer__inner">
-      <a href="#">Dicas de Saúde Mental</a>
-      <span class="site-footer__sep" aria-hidden="true">·</span>
-      <a href="#">Política de LGPD (Dom Alberto School)</a>
+      <p class="site-footer__line">Projeto de Extensão HelpProf</p>
+      <p class="site-footer__line">
+        <a class="site-footer__link" href="mailto:sugestoes@helpprof.local">Mande uma sugestão (E-mail)</a>
+      </p>
     </div>
   </footer>
-
-  <div class="assistant-dock" id="assistant-dock">
-    <div
-      class="assistant-panel"
-      id="assistant-panel"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="assistant-panel-title"
-      hidden
-    >
-      <div class="assistant-panel__head">
-        <h2 id="assistant-panel-title" class="assistant-panel__title">Assistente TechMestre (Offline/RAG)</h2>
-        <button type="button" class="assistant-panel__close" id="assistant-close" aria-label="Fechar assistente">&times;</button>
-      </div>
-      <div class="chat-widget" role="region" aria-label="Assistente de chat">
-        <div class="chat-widget__suggestions" role="group" aria-label="Sugestões rápidas">
-          <button type="button" class="pill">Como congelar linha no Excel?</button>
-          <button type="button" class="pill">Compartilhar pasta no Drive?</button>
-        </div>
-        <div class="chat-widget__stage">
-          <div class="knowledge-cards" aria-hidden="true">
-            <div class="k-card k-card--1">
-              <span class="k-card__bar"></span><span class="k-card__dots"><i></i><i></i><i></i></span>
-              <span class="k-card__lines"></span>
-            </div>
-            <div class="k-card k-card--2">
-              <span class="k-card__nodes"></span>
-              <span class="k-card__lines"></span>
-            </div>
-            <div class="k-card k-card--3">
-              <span class="k-card__grid"></span>
-            </div>
-          </div>
-          <div class="chat-widget__input-wrap">
-            <label class="visually-hidden" for="chat-input">Mensagem para o assistente</label>
-            <input id="chat-input" class="chat-widget__input" type="text" placeholder="Pergunte algo sobre ferramentas escolares…" autocomplete="off" />
-            <button type="button" class="chat-widget__send" aria-label="Enviar mensagem">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <button type="button" class="assistant-fab" id="assistant-toggle" aria-expanded="false" aria-controls="assistant-panel" title="Abrir Assistente TechMestre">
-      <span class="assistant-fab__glyph" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3C7 3 4 7 4 11c0 3 2 6 4 7v3l4-2c1 0 0 0 0 0 5 0 8-4 8-8 0-4-3-8-8-8z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="11" r="1" fill="currentColor"/><circle cx="12" cy="11" r="1" fill="currentColor"/><circle cx="15" cy="11" r="1" fill="currentColor"/></svg>
-      </span>
-      <span class="visually-hidden">Assistente TechMestre</span>
-    </button>
-  </div>
 
   <script src="js/main.js"></script>
 </body>
