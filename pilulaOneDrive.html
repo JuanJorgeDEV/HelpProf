@@ -2,172 +2,18 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="HelpProf — suporte rápido e apoio leve para professores da rede pública." />
-  <title>HelpProf — OneDrive: enviar documento</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
+  <title>HelpProf — Redirecionando…</title>
+  <meta http-equiv="refresh" content="0;url=pilula.html" />
+  <script>
+    (function () {
+      var q = window.location.search || "";
+      window.location.replace("pilula.html" + q);
+    })();
+  </script>
 </head>
 <body>
-  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
-
-  <header class="site-header" role="banner">
-    <div class="wrap site-header__inner">
-      <a href="index.html#inicio" class="brand brand--logo" aria-label="HelpProf — início">
-        <img class="brand__img" src="Logo.jpeg" alt="HelpProf" width="100" height="100" decoding="async" />
-      </a>
-      <nav class="site-nav" aria-label="Principal">
-        <ul class="site-nav__list">
-          <li><a class="site-nav__link" href="index.html#inicio">Início</a></li>
-          <li><a class="site-nav__link" href="index.html#perguntas-recentes">Perguntas Recentes</a></li>
-          <li><a class="site-nav__link" href="index.html#contato">Contato</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <main id="conteudo-principal" class="main">
-    <div class="wrap main__inner">
-      <section id="inicio" class="dual-guide glass-card" aria-labelledby="dual-guide-title">
-        <h1 id="dual-guide-title" class="dual-guide__title">Como enviar um documento no OneDrive da escola</h1>
-
-        <div class="tab-switcher" role="tablist" aria-label="Modo do guia">
-          <button
-            type="button"
-            class="tab-switcher__btn is-active"
-            id="tab-btn-passos"
-            role="tab"
-            aria-selected="true"
-            aria-controls="panel-passos"
-            data-tab="passos"
-          >
-            Passo a Passo (Sobrevivência)
-          </button>
-          <button
-            type="button"
-            class="tab-switcher__btn"
-            id="tab-btn-detalhe"
-            role="tab"
-            aria-selected="false"
-            aria-controls="panel-detalhe"
-            data-tab="detalhe"
-            tabindex="-1"
-          >
-            Detalhamento (Domínio)
-          </button>
-        </div>
-
-        <div class="tab-panels">
-          <div
-            id="panel-passos"
-            class="tab-panel"
-            role="tabpanel"
-            aria-labelledby="tab-btn-passos"
-            data-panel="passos"
-          >
-            <div class="slide-embed" aria-label="Área reservada para incorporação do Google Slides">
-              <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQc-B3PmnJnc-d3N-z9Y6ZOBIPtYiyI9JQv8-EUnABqy7VHccxS-ZFiCGdHTxp0pAS-YDGNlH3wp5GT/pubembed?start=true&loop=false&delayms=60000" frameborder="0" width="100%" height="100%" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe>
-            </div>
-
-            <ol class="steps-list">
-              <li class="steps-list__item">Clique no link da pasta que a coordenação da sua escola forneceu.</li>
-              <li class="steps-list__item">Acesse a sua biblioteca de arquivos no computador.</li>
-              <li class="steps-list__item">Encontre o arquivo ou documento que você gostaria de enviar.</li>
-              <li class="steps-list__item">Arraste o arquivo para dentro da tela do OneDrive ou clique no botão &lsquo;Fazer Upload&rsquo;.</li>
-            </ol>
-
-            <div class="lume-support">
-              <p class="lume-support__text">Ainda com dúvidas? Chame a Lume!</p>
-              <div class="lume-support__figure">
-                <div id="lume-speech" class="speech-bubble" role="status" aria-live="polite" hidden>
-                  Estou aqui para ajudar! Qual a sua dúvida?
-                </div>
-                <img
-                  id="lume-mascot"
-                  class="lume-mascot"
-                  src="Mao abaixada.png"
-                  data-src-down="Mao abaixada.png"
-                  data-src-up="Mao levantada.png"
-                  width="160"
-                  height="160"
-                  alt="Lume, coruja mascote do HelpProf"
-                  decoding="async"
-                  tabindex="0"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div
-            id="panel-detalhe"
-            class="tab-panel"
-            role="tabpanel"
-            aria-labelledby="tab-btn-detalhe"
-            hidden
-            data-panel="detalhe"
-          >
-            <h2 class="tab-panel__heading">O que é o OneDrive?</h2>
-            <p class="tab-panel__lede">
-              O OneDrive funciona como o seu &lsquo;pen-drive nas nuvens&rsquo;. Ele permite que você guarde seus arquivos com segurança e os acesse de qualquer computador da escola ou da sua casa, sem precisar ficar enviando tudo por e-mail.
-            </p>
-
-            <h3 class="tab-panel__sub">Funções Principais</h3>
-            <ul class="icon-list">
-              <li class="icon-list__item">
-                <span class="icon-list__icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l7 4v6c0 4-3 7-7 8-4-1-7-4-7-8V7l7-4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </span>
-                <span>Armazenamento automático e seguro.</span>
-              </li>
-              <li class="icon-list__item">
-                <span class="icon-list__icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a5 5 0 007.54.54L21 16M14 11a5 5 0 00-7.54-.54L3 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="7" cy="7" r="2" fill="currentColor"/><circle cx="17" cy="17" r="2" fill="currentColor"/></svg>
-                </span>
-                <span>Compartilhamento de links direto com a coordenação.</span>
-              </li>
-              <li class="icon-list__item">
-                <span class="icon-list__icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-                </span>
-                <span>Edição de documentos simultânea com outros professores.</span>
-              </li>
-            </ul>
-
-            <div class="related-pills">
-              <p class="related-pills__title">Pílulas Relacionadas:</p>
-              <div class="related-pills__actions">
-                <button type="button" class="btn-pill">Como criar uma pasta nova</button>
-                <button type="button" class="btn-pill">Como compartilhar um link externo</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="quick-tools" id="perguntas-recentes" aria-labelledby="quick-tools-title">
-        <h2 id="quick-tools-title" class="quick-tools__title">Acesso Rápido por Ferramentas (Filtros)</h2>
-        <ul class="quick-tools__grid">
-          <li><a class="quick-tool" href="#" aria-label="OneDrive"><span class="quick-tool__abbr">OD</span><span class="quick-tool__name">OneDrive</span></a></li>
-          <li><a class="quick-tool" href="#" aria-label="Word"><span class="quick-tool__abbr">W</span><span class="quick-tool__name">Word</span></a></li>
-          <li><a class="quick-tool" href="#" aria-label="WhatsApp"><span class="quick-tool__abbr">WA</span><span class="quick-tool__name">WhatsApp</span></a></li>
-          <li><a class="quick-tool" href="#" aria-label="Excel"><span class="quick-tool__abbr">X</span><span class="quick-tool__name">Excel</span></a></li>
-          <li><a class="quick-tool" href="#" aria-label="Canva"><span class="quick-tool__abbr">C</span><span class="quick-tool__name">Canva</span></a></li>
-          <li><a class="quick-tool" href="#" aria-label="SED"><span class="quick-tool__abbr">SED</span><span class="quick-tool__name">SED</span></a></li>
-          <li><a class="quick-tool" href="#" aria-label="CMSP"><span class="quick-tool__abbr">CM</span><span class="quick-tool__name">CMSP</span></a></li>
-        </ul>
-      </section>
-
-    </div>
-  </main>
-
-  <footer class="site-footer" role="contentinfo">
-    <div class="wrap">
-      <p class="site-footer__text">Projeto de Extensão HelpProf | Apoio leve para o seu dia a dia na escola.</p>
-    </div>
-  </footer>
-
-  <script src="js/main.js"></script>
+  <p style="font-family: system-ui, sans-serif; padding: 1.5rem">
+    Redirecionando para <a href="pilula.html">pilula.html</a> — use <code>?id=&lt;uuid&gt;</code> na URL.
+  </p>
 </body>
 </html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HelpProf — pílula de suporte técnico para professores." />
+  <title>HelpProf — Pílula</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
+
+  <header class="site-header" role="banner">
+    <div class="wrap site-header__inner">
+      <a href="index.html#inicio" class="brand brand--logo" aria-label="HelpProf — início">
+        <img class="brand__img" src="Logo.jpeg" alt="HelpProf" width="100" height="100" decoding="async" />
+      </a>
+      <nav class="site-nav" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html#inicio">Início</a></li>
+          <li><a class="site-nav__link" href="listagem.html">Pílulas</a></li>
+          <li><a class="site-nav__link" href="index.html#perguntas-recentes">Perguntas Recentes</a></li>
+          <li><a class="site-nav__link" href="index.html#contato">Contato</a></li>
+          <li><a class="site-nav__link" href="admin.html">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo-principal" class="main">
+    <div class="wrap main__inner">
+      <section id="inicio" class="dual-guide glass-card" aria-labelledby="dual-guide-title">
+        <div id="pill-brand-bar" class="pill-brand-bar" hidden role="group" aria-label="Ferramenta">
+          <img id="pill-brand-logo" class="pill-brand-bar__logo" src="" alt="" width="42" height="42" decoding="async" />
+          <span id="pill-brand-label" class="pill-brand-bar__label"></span>
+        </div>
+
+        <h1 id="dual-guide-title" class="dual-guide__title">Carregando…</h1>
+
+        <div class="tab-switcher" role="tablist" aria-label="Modo do guia">
+          <button
+            type="button"
+            class="tab-switcher__btn is-active"
+            id="tab-btn-passos"
+            role="tab"
+            aria-selected="true"
+            aria-controls="panel-passos"
+            data-tab="passos"
+          >
+            Passo a Passo (Sobrevivência)
+          </button>
+          <button
+            type="button"
+            class="tab-switcher__btn"
+            id="tab-btn-detalhe"
+            role="tab"
+            aria-selected="false"
+            aria-controls="panel-detalhe"
+            data-tab="detalhe"
+            tabindex="-1"
+          >
+            Detalhamento (Domínio)
+          </button>
+        </div>
+
+        <div class="tab-panels">
+          <div
+            id="panel-passos"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-passos"
+            data-panel="passos"
+          >
+            <div class="slide-embed" id="pill-slide-wrap" hidden style="display:none" aria-label="Apresentação Google Slides"></div>
+
+            <div id="pill-content-area" class="pill-content-area">
+              <p class="steps-list__item steps-list__item--muted">Carregando…</p>
+            </div>
+
+            <div class="lume-support">
+              <p class="lume-support__text">Ainda com dúvidas? Chame a Lume!</p>
+              <div class="lume-support__figure">
+                <div id="lume-speech" class="speech-bubble" role="status" aria-live="polite" hidden>
+                  Estou aqui para ajudar! Qual a sua dúvida?
+                </div>
+                <img
+                  id="lume-mascot"
+                  class="lume-mascot"
+                  src="Mao abaixada.png"
+                  data-src-down="Mao abaixada.png"
+                  data-src-up="Mao levantada.png"
+                  width="160"
+                  height="160"
+                  alt="Lume, coruja mascote do HelpProf"
+                  decoding="async"
+                  tabindex="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="panel-detalhe"
+            class="tab-panel"
+            role="tabpanel"
+            aria-labelledby="tab-btn-detalhe"
+            hidden
+            data-panel="detalhe"
+          >
+            <h2 class="tab-panel__heading">Modo Domínio</h2>
+            <p class="tab-panel__lede tab-panel__lede-dynamic">
+              Guia aprofundado em breve. Use a aba de passos enquanto isso.
+            </p>
+
+            <div class="related-pills">
+              <div class="related-pills__head hp-section__heading-row hp-section__heading-row--compact">
+                <h3 id="related-pills-title" class="related-pills__title">Pílulas relacionadas</h3>
+                <a id="pill-related-see-more" class="hp-section__see-more" href="listagem.html">Ver mais<span class="hp-section__see-more-arrow" aria-hidden="true"> →</span></a>
+              </div>
+              <div class="pill-carousel pill-carousel--related" aria-labelledby="related-pills-title">
+                <button type="button" class="pill-carousel__arrow pill-carousel__arrow--prev pill-related-prev" aria-label="Pílulas relacionadas anteriores">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="pill-carousel__viewport" id="pill-related-viewport" tabindex="0" role="region" aria-roledescription="carrossel" aria-label="Outras pílulas da mesma ferramenta">
+                  <ul class="pill-carousel__track" id="pill-related-track"></ul>
+                </div>
+                <button type="button" class="pill-carousel__arrow pill-carousel__arrow--next pill-related-next" aria-label="Próximas pílulas relacionadas">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+              <p id="pill-related-empty" class="related-pills__empty" hidden>Não há outras pílulas desta ferramenta no momento.</p>
+              <div class="related-pills__footer">
+                <a class="btn-pill" href="index.html#inicio">Voltar ao início</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="wrap">
+      <p class="site-footer__text">Projeto de Extensão HelpProf | Apoio leve para o seu dia a dia na escola.</p>
+    </div>
+  </footer>
+
+  <script src="js/hp-config.js"></script>
+  <script src="js/tool-assets.js"></script>
+  <script src="js/pill-page.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

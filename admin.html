@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>HelpProf — Painel Triad Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    :root { --adm-accent: #6366f1; }
+    .adm-wrap    { max-width: 1060px; margin: 0 auto; padding: 1.5rem; }
+    .adm-header  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; }
+    .adm-card    { background: var(--glass-bg-intense); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--glass-shadow); border: 1px solid var(--glass-border); margin-bottom: 1.25rem; }
+    .adm-card h2 { margin-top: 0; font-size: 1.1rem; color: var(--text-main); }
+    .adm-tabs    { display: flex; gap: .5rem; flex-wrap: wrap; border-bottom: 2px solid #e2e8f0; margin-bottom: 1.25rem; }
+    .adm-tab     { padding: .5rem 1.1rem; font: 600 .9rem/1 inherit; background: none; border: none; border-bottom: 3px solid transparent; cursor: pointer; color: var(--text-muted); margin-bottom: -2px; }
+    .adm-tab.is-active { border-bottom-color: var(--adm-accent); color: var(--adm-accent); }
+    .adm-pane    { display: none; }
+    .adm-pane.is-active { display: block; }
+    .adm-grid    { display: grid; gap: .85rem; }
+    .adm-grid label { display: flex; flex-direction: column; gap: .3rem; font-weight: 600; font-size: .875rem; color: var(--text-muted); }
+    .adm-grid input,
+    .adm-grid textarea,
+    .adm-grid select { font: inherit; padding: .55rem .7rem; border-radius: var(--radius-sm); border: 1px solid #e2e8f0; background: #fff; color: var(--text-main); }
+    .adm-grid textarea { min-height: 130px; resize: vertical; font-family: ui-monospace, monospace; font-size: .87rem; }
+    .adm-note    { font-size: .82rem; color: var(--text-muted); margin-top: .25rem; }
+    .adm-row     { display: flex; flex-wrap: wrap; gap: .65rem; align-items: center; margin-top: .75rem; }
+    .adm-table-wrap { overflow-x: auto; margin-top: .75rem; }
+    table.adm-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    table.adm-table th, table.adm-table td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+    table.adm-table th { color: var(--text-muted); font-weight: 600; white-space: nowrap; }
+    table.adm-table td:last-child { white-space: nowrap; }
+    .btn-primary,.btn-secondary,.btn-danger,.btn-ghost { cursor: pointer; font: 600 .875rem/1 inherit; padding: .5rem 1rem; border-radius: var(--radius-sm); }
+    .btn-primary  { background: linear-gradient(135deg,var(--adm-accent),#6366f1); color:#fff; border:none; }
+    .btn-secondary{ background:#fff; border:1px solid #e2e8f0; color: var(--text-main); }
+    .btn-danger   { background:#fff; border:1px solid #fca5a5; color:#b91c1c; }
+    .btn-ghost    { background:none; border:none; color: var(--adm-accent); text-decoration:underline; padding:0; }
+    .adm-status   { font-size: .875rem; color: var(--text-muted); min-height: 1.2em; }
+    .adm-badge    { display:inline-block; padding:.15rem .5rem; border-radius:9999px; font-size:.75rem; font-weight:600; background:#e0e7ff; color:#3730a3; }
+    .adm-badge--arch { background:#fee2e2; color:#991b1b; }
+    .swatch { display:inline-block; width:14px; height:14px; border-radius:3px; vertical-align:middle; margin-right:5px; border:1px solid rgba(0,0,0,.1); }
+    .autocomplete-wrap { position:relative; }
+    .autocomplete-list { position:absolute; top:100%; left:0; right:0; z-index:99; background:#fff; border:1px solid #e2e8f0; border-radius:var(--radius-sm); max-height:200px; overflow-y:auto; box-shadow:0 4px 16px rgba(0,0,0,.1); }
+    .autocomplete-list li { padding:.5rem .75rem; cursor:pointer; font-size:.875rem; list-style:none; }
+    .autocomplete-list li:hover,.autocomplete-list li[aria-selected=true] { background:#f1f5f9; }
+    .adm-login-card { max-width:400px; margin:4rem auto; }
+    @media (max-width:600px) { .adm-wrap { padding: 1rem .75rem; } }
+  </style>
+</head>
+<body>
+<header class="site-header" role="banner">
+  <div class="wrap site-header__inner">
+    <a href="index.html" class="brand" aria-label="HelpProf — início">
+      <img class="brand__img" src="Logo.jpeg" alt="HelpProf" width="100" height="100" decoding="async" />
+    </a>
+    <nav class="site-nav" aria-label="Principal">
+      <ul class="site-nav__list">
+        <li><a class="site-nav__link" href="index.html">Início</a></li>
+        <li><a class="site-nav__link" href="admin.html" aria-current="page" style="color:var(--adm-accent);font-weight:600">Admin</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="adm-wrap" id="conteudo-principal">
+  <section id="adm-login" class="adm-card adm-login-card">
+    <h1 style="font-size:1.25rem;margin-top:0">Painel Triad Support</h1>
+    <div class="adm-grid" style="max-width:380px">
+      <label>E-mail <input type="email" id="adm-email" autocomplete="username" required /></label>
+      <label>Senha  <input type="password" id="adm-password" autocomplete="current-password" required /></label>
+      <div class="adm-row"><button type="button" class="btn-primary" id="btn-login">Entrar</button></div>
+      <p id="adm-login-status" class="adm-status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section id="adm-panel" hidden>
+    <div class="adm-header">
+      <h1 style="font-size:1.25rem;margin:0">Painel Triad Support</h1>
+      <div class="adm-row" style="margin:0">
+        <span id="adm-user-label" class="adm-note"></span>
+        <button type="button" class="btn-secondary" id="btn-logout">Sair</button>
+      </div>
+    </div>
+
+    <p id="adm-status" class="adm-status" aria-live="polite" style="margin-bottom:.75rem"></p>
+
+    <nav class="adm-tabs" role="tablist" aria-label="Seções do painel">
+      <button class="adm-tab is-active" role="tab" aria-selected="true"  data-tab="pills"     >Pílulas</button>
+      <button class="adm-tab"            role="tab" aria-selected="false" data-tab="categories">Ferramentas</button>
+    </nav>
+
+    <!-- ======================== ABA PÍLULAS ======================== -->
+    <div class="adm-pane is-active" id="pane-pills">
+      <div class="adm-card">
+        <h2 id="pill-form-title">Nova pílula</h2>
+        <form id="pill-form" class="adm-grid">
+          <input type="hidden" id="pill-edit-id" value="" />
+          <label>Título <input type="text" id="pill-title" required maxlength="500" /></label>
+
+          <label>Ferramenta
+            <div class="autocomplete-wrap">
+              <input type="text" id="pill-category-input" placeholder="Buscar ou criar…" autocomplete="off" required />
+              <input type="hidden" id="pill-category" />
+              <ul class="autocomplete-list" id="cat-dropdown" hidden></ul>
+            </div>
+          </label>
+
+          <label>Tags (separadas por vírgula)
+            <input type="text" id="pill-tags" placeholder="onedrive, envio, arquivo" />
+          </label>
+          <label>Conteúdo (Markdown)
+            <textarea id="pill-content" required placeholder="## Passo 1&#10;- Clique em..."></textarea>
+          </label>
+          <label>URL Google Slides <em class="adm-note">(opcional — /pubembed ou /pub)</em>
+            <input type="url" id="pill-slides-url" maxlength="2048" placeholder="https://docs.google.com/presentation/d/e/…/pub?…" />
+          </label>
+          <div class="adm-row">
+            <button type="submit" class="btn-primary" id="btn-pill-submit">Criar pílula</button>
+            <button type="button" class="btn-secondary" id="btn-pill-cancel" hidden>Cancelar edição</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="adm-card">
+        <div class="adm-row" style="justify-content:space-between;margin-top:0">
+          <h2 style="margin:0">Pílulas no banco</h2>
+          <div class="adm-row" style="margin:0">
+            <label style="flex-direction:row;align-items:center;gap:.5rem;font-weight:500;font-size:.875rem">
+              <input type="checkbox" id="include-deleted" /> Incluir arquivadas
+            </label>
+            <button type="button" class="btn-secondary" id="btn-refresh-pills">Atualizar</button>
+          </div>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Título</th><th>Ferramenta</th><th>Tags</th><th>Views</th><th>Slide</th><th>Ações</th></tr></thead>
+            <tbody id="pills-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== ABA FERRAMENTAS ======================== -->
+    <div class="adm-pane" id="pane-categories">
+      <div class="adm-card">
+        <h2 id="cat-form-title">Nova ferramenta / categoria</h2>
+        <form id="cat-form" class="adm-grid" style="max-width:600px">
+          <input type="hidden" id="cat-edit-id" value="" />
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
+            <label>Slug (identificador único)
+              <input type="text" id="cat-slug" required maxlength="60" placeholder="KAHOOT" style="text-transform:uppercase" />
+              <span class="adm-note">Maiúsculas, sem espaços. Ex.: KAHOOT, FORMS</span>
+            </label>
+            <label>Nome exibido
+              <input type="text" id="cat-name" required maxlength="200" placeholder="Kahoot" />
+            </label>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
+            <label>URL da logo <span class="adm-note">(relativa ou https://)</span>
+              <input type="text" id="cat-logo-url" maxlength="2048" placeholder="assets/kahoot.png" />
+            </label>
+            <label>Cor da marca (hex)
+              <input type="color" id="cat-brand-color" value="#6366f1" style="padding:.25rem;height:2.5rem" />
+            </label>
+          </div>
+          <label style="max-width:160px">Ordem de exibição
+            <input type="number" id="cat-sort-order" min="0" max="9999" value="0" />
+          </label>
+          <div class="adm-row">
+            <button type="submit" class="btn-primary" id="btn-cat-submit">Criar ferramenta</button>
+            <button type="button" class="btn-secondary" id="btn-cat-cancel" hidden>Cancelar edição</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="adm-card">
+        <div class="adm-row" style="justify-content:space-between;margin-top:0">
+          <h2 style="margin:0">Ferramentas cadastradas</h2>
+          <button type="button" class="btn-secondary" id="btn-refresh-cats">Atualizar</button>
+        </div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Slug</th><th>Nome</th><th>Cor</th><th>Logo</th><th>Ordem</th><th>Ações</th></tr></thead>
+            <tbody id="cats-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/hp-config.js"></script>
+<script src="js/tool-assets.js"></script>
+<script type="module" src="js/admin-panel.js"></script>
+</body>
+</html>

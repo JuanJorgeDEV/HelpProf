@@ -17,13 +17,15 @@
   <header class="site-header" role="banner">
     <div class="wrap site-header__inner">
       <a href="#inicio" class="brand" aria-label="HelpProf — início">
-        <span class="brand__text"><span class="brand__help">Help</span><span class="brand__prof">Prof</span></span>
+        <img class="brand__img" src="Logo.jpeg" alt="HelpProf" width="100" height="100" decoding="async" />
       </a>
       <nav class="site-nav" aria-label="Principal">
         <ul class="site-nav__list">
           <li><a class="site-nav__link" href="#inicio">Início</a></li>
+          <li><a class="site-nav__link" href="listagem.html">Pílulas</a></li>
           <li><a class="site-nav__link" href="#perguntas-recentes">Perguntas Recentes</a></li>
           <li><a class="site-nav__link" href="#contato">Contato</a></li>
+          <li><a class="site-nav__link" href="admin.html" style="font-weight:600;color:#8b5cf6;">Admin</a></li>
         </ul>
       </nav>
     </div>
@@ -33,38 +35,21 @@
     <div class="wrap main__inner">
       <!-- 2. Destaques — carrossel de pílulas -->
       <section id="inicio" class="hp-section section-reveal" aria-labelledby="destaques-title">
-        <h2 id="destaques-title" class="hp-section__title">Pílulas Mais Acessadas</h2>
-        <div class="pill-carousel" data-carousel>
+        <div class="hp-section__heading-row">
+          <h2 id="destaques-title" class="hp-section__title">Pílulas Mais Acessadas</h2>
+          <a class="hp-section__see-more" href="listagem.html">Ver mais<span class="hp-section__see-more-arrow" aria-hidden="true"> →</span></a>
+        </div>
+        <div class="pill-carousel">
           <button type="button" class="pill-carousel__arrow pill-carousel__arrow--prev" id="pill-carousel-prev" aria-label="Pílulas anteriores">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <div class="pill-carousel__viewport" id="pill-carousel-viewport" tabindex="0" role="region" aria-roledescription="carrossel" aria-label="Pílulas mais acessadas">
             <ul class="pill-carousel__track" id="pill-carousel-track">
+              <!-- populado dinamicamente por js/home.js -->
               <li class="pill-carousel__slide">
-                <article class="pill-card glass-card">
-                  <div class="pill-card__icon pill-card__icon--doc" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  </div>
-                  <h3 class="pill-card__title">Como destravar o SED</h3>
-                  <p class="pill-card__meta">2 min</p>
-                </article>
-              </li>
-              <li class="pill-carousel__slide">
-                <a class="pill-card pill-card--link glass-card" href="pilulaOneDrive.html">
-                  <div class="pill-card__icon pill-card__icon--play" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7L8 5z" fill="currentColor"/></svg>
-                  </div>
-                  <h3 class="pill-card__title">OneDrive: enviar documento</h3>
-                  <p class="pill-card__meta">2 min</p>
-                </a>
-              </li>
-              <li class="pill-carousel__slide">
-                <article class="pill-card glass-card">
-                  <div class="pill-card__icon pill-card__icon--doc" aria-hidden="true">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                  </div>
-                  <h3 class="pill-card__title">Planilha: filtros sem medo</h3>
-                  <p class="pill-card__meta">2 min</p>
+                <article class="pill-card glass-card pill-card--skeleton" aria-hidden="true">
+                  <div class="pill-card__icon pill-card__icon--doc"></div>
+                  <h3 class="pill-card__title skeleton-line" style="width:70%;height:1rem;border-radius:4px;background:rgba(0,0,0,.07)"></h3>
                 </article>
               </li>
             </ul>
@@ -77,43 +62,55 @@
 
       <!-- 3. Ferramentas didáticas -->
       <section id="perguntas-recentes" class="hp-section section-reveal" aria-labelledby="sala-title">
-        <h2 id="sala-title" class="hp-section__title">Para a Sala de Aula</h2>
+        <div class="hp-section__heading-row">
+          <h2 id="sala-title" class="hp-section__title">Para a Sala de Aula</h2>
+          <a class="hp-section__see-more" href="listagem.html">Ver mais<span class="hp-section__see-more-arrow" aria-hidden="true"> →</span></a>
+        </div>
         <ul class="classroom-grid">
           <li>
-            <article class="classroom-card classroom-card--kahoot glass-card">
-              <div class="classroom-card__icon" aria-hidden="true">K</div>
-              <h3 class="classroom-card__name">Kahoot</h3>
-              <p class="classroom-card__desc">Quizzes ao vivo para engajar turmas grandes com feedback imediato e ritmo leve.</p>
-            </article>
+            <a class="classroom-card-link" href="listagem.html?q=Kahoot">
+              <article class="classroom-card classroom-card--kahoot glass-card">
+                <div class="classroom-card__icon" aria-hidden="true">K</div>
+                <h3 class="classroom-card__name">Kahoot</h3>
+                <p class="classroom-card__desc">Quizzes ao vivo para engajar turmas grandes com feedback imediato e ritmo leve.</p>
+              </article>
+            </a>
           </li>
           <li>
-            <article class="classroom-card classroom-card--viz3d glass-card">
-              <div class="classroom-card__icon" aria-hidden="true">3D</div>
-              <h3 class="classroom-card__name">Visualizador 3D</h3>
-              <p class="classroom-card__desc">Explore estruturas em ciências e biologia com modelos que ganham profundidade na lousa digital.</p>
-            </article>
+            <a class="classroom-card-link" href="listagem.html?q=Visualizador+3D">
+              <article class="classroom-card classroom-card--viz3d glass-card">
+                <div class="classroom-card__icon" aria-hidden="true">3D</div>
+                <h3 class="classroom-card__name">Visualizador 3D</h3>
+                <p class="classroom-card__desc">Explore estruturas em ciências e biologia com modelos que ganham profundidade na lousa digital.</p>
+              </article>
+            </a>
           </li>
           <li>
-            <article class="classroom-card classroom-card--repo glass-card">
-              <div class="classroom-card__icon" aria-hidden="true">R</div>
-              <h3 class="classroom-card__name">Repositório de Aulas</h3>
-              <p class="classroom-card__desc">Organize sequências didáticas e materiais por turma para achar tudo em um só lugar.</p>
-            </article>
+            <a class="classroom-card-link" href="listagem.html?q=Reposit%C3%B3rio+de+Aulas">
+              <article class="classroom-card classroom-card--repo glass-card">
+                <div class="classroom-card__icon" aria-hidden="true">R</div>
+                <h3 class="classroom-card__name">Repositório de Aulas</h3>
+                <p class="classroom-card__desc">Organize sequências didáticas e materiais por turma para achar tudo em um só lugar.</p>
+              </article>
+            </a>
           </li>
         </ul>
       </section>
 
       <!-- 4. Filtros operacionais -->
       <section id="acesso-rapido" class="hp-section section-reveal" aria-labelledby="quick-access-title">
-        <h2 id="quick-access-title" class="hp-section__title">Acesso Rápido por Ferramenta</h2>
+        <div class="hp-section__heading-row">
+          <h2 id="quick-access-title" class="hp-section__title">Acesso Rápido por Ferramenta</h2>
+          <a class="hp-section__see-more" href="listagem.html">Ver todas<span class="hp-section__see-more-arrow" aria-hidden="true"> →</span></a>
+        </div>
         <ul class="quick-access-grid">
-          <li><a class="quick-access-btn" href="#" aria-label="OneDrive"><span class="quick-access-btn__glyph">OD</span><span class="quick-access-btn__label">OneDrive</span></a></li>
-          <li><a class="quick-access-btn" href="#" aria-label="WhatsApp Web"><span class="quick-access-btn__glyph">WA</span><span class="quick-access-btn__label">WhatsApp Web</span></a></li>
-          <li><a class="quick-access-btn" href="#" aria-label="Word"><span class="quick-access-btn__glyph">W</span><span class="quick-access-btn__label">Word</span></a></li>
-          <li><a class="quick-access-btn" href="#" aria-label="Excel"><span class="quick-access-btn__glyph">X</span><span class="quick-access-btn__label">Excel</span></a></li>
-          <li><a class="quick-access-btn" href="#" aria-label="Canva"><span class="quick-access-btn__glyph">C</span><span class="quick-access-btn__label">Canva</span></a></li>
-          <li><a class="quick-access-btn" href="#" aria-label="SED"><span class="quick-access-btn__glyph">SED</span><span class="quick-access-btn__label">SED</span></a></li>
-          <li><a class="quick-access-btn" href="#" aria-label="CMSP"><span class="quick-access-btn__glyph">CM</span><span class="quick-access-btn__label">CMSP</span></a></li>
+          <li><a class="quick-access-btn" href="listagem.html?tool_category=ONEDRIVE" aria-label="OneDrive"><span class="quick-access-btn__glyph">OD</span><span class="quick-access-btn__label">OneDrive</span></a></li>
+          <li><a class="quick-access-btn" href="listagem.html?tool_category=WHATSAPP" aria-label="WhatsApp Web"><span class="quick-access-btn__glyph">WA</span><span class="quick-access-btn__label">WhatsApp Web</span></a></li>
+          <li><a class="quick-access-btn" href="listagem.html?tool_category=WORD" aria-label="Word"><span class="quick-access-btn__glyph">W</span><span class="quick-access-btn__label">Word</span></a></li>
+          <li><a class="quick-access-btn" href="listagem.html?tool_category=EXCEL" aria-label="Excel"><span class="quick-access-btn__glyph">X</span><span class="quick-access-btn__label">Excel</span></a></li>
+          <li><a class="quick-access-btn" href="listagem.html?tool_category=CANVA" aria-label="Canva"><span class="quick-access-btn__glyph">C</span><span class="quick-access-btn__label">Canva</span></a></li>
+          <li><a class="quick-access-btn" href="listagem.html?tool_category=SED" aria-label="SED"><span class="quick-access-btn__glyph">SED</span><span class="quick-access-btn__label">SED</span></a></li>
+          <li><a class="quick-access-btn" href="listagem.html?tool_category=CMSP" aria-label="CMSP"><span class="quick-access-btn__glyph">CM</span><span class="quick-access-btn__label">CMSP</span></a></li>
         </ul>
       </section>
 
@@ -163,6 +160,9 @@
     </div>
   </footer>
 
+  <script src="js/hp-config.js"></script>
+  <script src="js/tool-assets.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/home.js"></script>
 </body>
 </html>

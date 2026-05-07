@@ -283,10 +283,105 @@ body {
   padding: 1rem;
 }
 
+.pill-brand-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.1rem;
+  border-radius: var(--radius-md);
+  /* fallback seguro para browsers sem color-mix(); JS sobrescreve via style inline */
+  background: rgba(99, 102, 241, 0.11);
+  border: 1px solid rgba(99, 102, 241, 0.28);
+  border-left: 4px solid var(--pill-brand-color, #6366f1);
+}
+
+.pill-brand-bar__logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fff;
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.pill-brand-bar__label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.pill-content-area {
+  margin-bottom: 1.8rem;
+  line-height: 1.7;
+}
+
+.pill-content-area h2,
+.pill-content-area h3,
+.pill-content-area h4 {
+  margin: 1.4rem 0 0.6rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.pill-content-area p {
+  margin: 0 0 0.75rem;
+  color: var(--text-main);
+}
+
+.pill-content-area ol,
+.pill-content-area ul {
+  margin: 0 0 1.1rem;
+  padding-left: 1.4rem;
+}
+
+.pill-content-area li {
+  margin-bottom: 0.4rem;
+  color: var(--text-main);
+}
+
+.pill-content-area ol {
+  counter-reset: step;
+  list-style: none;
+  padding-left: 0;
+}
+
+.pill-content-area ol > li {
+  counter-increment: step;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+.pill-content-area ol > li::before {
+  content: counter(step);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background: var(--pill-brand-color, #6366f1);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* classes usadas pelo fallback manual */
 .steps-list {
   margin: 0 0 2rem;
   padding: 0 0 0 1.35rem;
   counter-reset: step;
+}
+
+.steps-list__item--muted {
+  color: var(--text-muted);
+  font-style: italic;
+  list-style-position: outside;
 }
 
 .steps-list__item {
@@ -443,17 +538,25 @@ body {
   border-top: 1px solid rgba(148, 163, 184, 0.25);
 }
 
+.related-pills__head {
+  align-items: flex-end;
+}
+
 .related-pills__title {
-  margin: 0 0 0.75rem;
+  margin: 0;
   font-size: 0.9375rem;
   font-weight: 700;
   color: var(--text-main);
 }
 
-.related-pills__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
+.related-pills__empty {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.related-pills__footer {
+  margin-top: 1rem;
 }
 
 .btn-pill {
@@ -623,6 +726,46 @@ body {
   text-align: center;
 }
 
+.hp-section__heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.hp-section__heading-row .hp-section__title {
+  margin: 0;
+  flex: 1 1 12rem;
+  text-align: left;
+}
+
+.hp-section__heading-row--compact {
+  margin-bottom: 0.75rem;
+}
+
+.hp-section__see-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-primary-purple);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hp-section__see-more:hover,
+.hp-section__see-more:focus-visible {
+  text-decoration: underline;
+  outline: none;
+}
+
+.hp-section__see-more-arrow {
+  font-weight: 700;
+}
+
 /* Carrossel — Pílulas mais acessadas */
 .pill-carousel {
   display: flex;
@@ -674,6 +817,33 @@ body {
     width: calc(33.333% - 0.67rem);
     min-width: 220px;
   }
+}
+
+.pill-carousel__slide--related {
+  flex: 0 0 min(100%, 240px);
+  width: min(100%, 240px);
+}
+
+@media (min-width: 720px) {
+  .pill-carousel--related .pill-carousel__slide--related {
+    flex: 0 0 220px;
+    width: 220px;
+    min-width: 200px;
+  }
+}
+
+.pill-card--compact {
+  min-height: 132px;
+  padding: 0.85rem 0.95rem 1rem;
+}
+
+.pill-card--compact .pill-card__icon {
+  width: 40px;
+  height: 40px;
+}
+
+.pill-card--compact .pill-card__title {
+  font-size: 0.95rem;
 }
 
 .pill-carousel__arrow {
@@ -771,6 +941,24 @@ body {
 }
 
 /* Sala de aula — grade 3 cards */
+.classroom-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-md);
+  outline: none;
+}
+
+.classroom-card-link:focus-visible .classroom-card {
+  outline: 2px solid var(--color-accent-mint);
+  outline-offset: 3px;
+}
+
+.classroom-card-link:hover .classroom-card {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.1);
+}
+
 .classroom-grid {
   list-style: none;
   margin: 0;
@@ -1125,4 +1313,136 @@ body {
   color: var(--text-muted);
   line-height: 1.55;
   border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* —— Listagem de pílulas (listagem.html) —— */
+.main--listing .listing-hero {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.listing-hero__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.35rem, 3.5vw, 1.65rem);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.listing-hero__lede {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.listing-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.listing-filters__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.listing-filters__label {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.listing-filters__input,
+.listing-filters__select {
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-main);
+}
+
+.listing-filters__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.listing-filters__submit {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 1.1rem;
+  background: linear-gradient(135deg, var(--color-primary-purple), #6366f1);
+  color: #fff;
+}
+
+.listing-filters__reset {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary-purple);
+}
+
+.listing-status {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.listing-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 560px) {
+  .listing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 860px) {
+  .listing-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.listing-grid__item {
+  min-width: 0;
+}
+
+.listing-card {
+  margin: 0;
+}
+
+.listing-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.75rem;
+}
+
+.listing-load-more {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.6rem 1.4rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--color-primary-purple);
+}
+
+.listing-load-more:hover,
+.listing-load-more:focus-visible {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.45);
+  outline: none;
 }

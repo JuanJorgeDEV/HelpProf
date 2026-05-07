@@ -5,33 +5,42 @@
    * Carrossel — Pílulas mais acessadas (index)
    * Rola o viewport horizontalmente ao clicar nas setas; largura do passo = 1 slide + gap.
    * ========================================================================== */
-  var carouselViewport = document.getElementById("pill-carousel-viewport");
-  var carouselPrev = document.getElementById("pill-carousel-prev");
-  var carouselNext = document.getElementById("pill-carousel-next");
-  var carouselTrack = document.getElementById("pill-carousel-track");
-
-  function getCarouselStepPx() {
-    if (!carouselTrack) return 300;
-    var slide = carouselTrack.querySelector(".pill-carousel__slide");
+  function getCarouselStepPx(track) {
+    if (!track) return 300;
+    var slide = track.querySelector(".pill-carousel__slide");
     if (!slide) return 300;
-    var styles = window.getComputedStyle(carouselTrack);
+    var styles = window.getComputedStyle(track);
     var gap = parseFloat(styles.columnGap || styles.gap) || 16;
     return slide.offsetWidth + gap;
   }
 
-  function scrollCarousel(delta) {
-    if (!carouselViewport) return;
-    carouselViewport.scrollBy({ left: delta, behavior: "smooth" });
+  function bindOneCarousel(root) {
+    if (!(root instanceof Element) || root.getAttribute("data-hp-carousel-bound") === "1") return;
+    root.setAttribute("data-hp-carousel-bound", "1");
+    var viewport = root.querySelector(".pill-carousel__viewport");
+    var prevBtn = root.querySelector(".pill-carousel__arrow--prev");
+    var nextBtn = root.querySelector(".pill-carousel__arrow--next");
+    var track = root.querySelector(".pill-carousel__track");
+    if (!viewport || !prevBtn || !nextBtn || !track) return;
+
+    function scrollBy(delta) {
+      viewport.scrollBy({ left: delta, behavior: "smooth" });
+    }
+
+    prevBtn.addEventListener("click", function () {
+      scrollBy(-getCarouselStepPx(track));
+    });
+    nextBtn.addEventListener("click", function () {
+      scrollBy(getCarouselStepPx(track));
+    });
   }
 
-  if (carouselViewport && carouselPrev && carouselNext) {
-    carouselPrev.addEventListener("click", function () {
-      scrollCarousel(-getCarouselStepPx());
-    });
-    carouselNext.addEventListener("click", function () {
-      scrollCarousel(getCarouselStepPx());
-    });
+  function bindCarousels() {
+    document.querySelectorAll(".pill-carousel").forEach(bindOneCarousel);
   }
+
+  bindCarousels();
+  window.HP_bindCarousels = bindCarousels;
 
   /* ==========================================================================
    * Animações de entrada — fade-in ao entrar no viewport

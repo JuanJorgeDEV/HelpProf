@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HelpProf — explore pílulas por ferramenta ou busca." />
+  <title>HelpProf — Pílulas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
+
+  <header class="site-header" role="banner">
+    <div class="wrap site-header__inner">
+      <a href="index.html#inicio" class="brand" aria-label="HelpProf — início">
+        <img class="brand__img" src="Logo.jpeg" alt="HelpProf" width="100" height="100" decoding="async" />
+      </a>
+      <nav class="site-nav" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html#inicio">Início</a></li>
+          <li><a class="site-nav__link" href="listagem.html" aria-current="page">Pílulas</a></li>
+          <li><a class="site-nav__link" href="index.html#contato">Contato</a></li>
+          <li><a class="site-nav__link" href="admin.html" style="font-weight:600;color:#8b5cf6;">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo-principal" class="main main--home main--listing">
+    <div class="wrap main__inner">
+      <header class="listing-hero">
+        <h1 class="listing-hero__title">Pílulas</h1>
+        <p class="listing-hero__lede">Filtre por ferramenta ou busque pelo título.</p>
+      </header>
+
+      <form id="listing-filters" class="listing-filters glass-card" role="search" action="listagem.html" method="get">
+        <div class="listing-filters__row">
+          <label class="listing-filters__label" for="listing-q">Busca</label>
+          <input
+            id="listing-q"
+            name="q"
+            type="search"
+            class="listing-filters__input"
+            placeholder="Ex.: OneDrive, planilha, SED…"
+            autocomplete="off"
+            maxlength="200"
+          />
+        </div>
+        <div class="listing-filters__row">
+          <label class="listing-filters__label" for="listing-category">Ferramenta</label>
+          <select id="listing-category" name="tool_category" class="listing-filters__select" aria-label="Filtrar por ferramenta">
+            <option value="">Todas as ferramentas</option>
+          </select>
+        </div>
+        <div class="listing-filters__actions">
+          <button type="submit" class="listing-filters__submit">Aplicar filtros</button>
+          <a href="listagem.html" class="listing-filters__reset">Limpar</a>
+        </div>
+      </form>
+
+      <p id="listing-status" class="listing-status" role="status" aria-live="polite"></p>
+
+      <ul id="listing-results" class="listing-grid" aria-label="Resultados"></ul>
+
+      <div class="listing-load-more-wrap">
+        <button type="button" id="listing-load-more" class="listing-load-more" hidden>Carregar mais</button>
+      </div>
+    </div>
+  </main>
+
+  <footer id="contato" class="site-footer site-footer--split" role="contentinfo">
+    <div class="wrap site-footer__inner">
+      <p class="site-footer__line">Projeto de Extensão HelpProf</p>
+      <p class="site-footer__line">
+        <a class="site-footer__link" href="mailto:sugestoes@helpprof.local">Mande uma sugestão (E-mail)</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/hp-config.js"></script>
+  <script src="js/tool-assets.js"></script>
+  <script src="js/listagem.js"></script>
+</body>
+</html>
