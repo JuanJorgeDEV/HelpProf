@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="HelpProf — Guias de Domínio completos por ferramenta didática." />
+  <title>HelpProf — Guias de Domínio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#conteudo-principal">Ir para o conteúdo</a>
+
+  <header class="site-header" role="banner">
+    <div class="wrap site-header__inner">
+      <a href="index.html#inicio" class="brand brand--logo" aria-label="HelpProf — início">
+        <img class="brand__img" src="Logo.jpeg" alt="HelpProf" width="100" height="100" decoding="async" />
+      </a>
+      <nav class="site-nav" aria-label="Principal">
+        <ul class="site-nav__list">
+          <li><a class="site-nav__link" href="index.html#inicio">Início</a></li>
+          <li><a class="site-nav__link" href="listagem.html">Pílulas</a></li>
+          <li><a class="site-nav__link" href="listagem-dominios.html" aria-current="page">Guias de Domínio</a></li>
+          <li><a class="site-nav__link" href="index.html#contato">Contato</a></li>
+          <li><a class="site-nav__link" href="admin.html" style="font-weight:600;color:#8b5cf6;">Admin</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="conteudo-principal" class="main main--domain-listing">
+    <div class="wrap domain-listing-wrap">
+      <header class="domain-listing-hero">
+        <h1 class="domain-listing-hero__title">Guias de Domínio</h1>
+        <p class="domain-listing-hero__lede">Conheça cada ferramenta em profundidade — do básico à prática avançada.</p>
+      </header>
+
+      <div class="domain-listing-toolbar">
+        <label class="visually-hidden" for="domain-search">Buscar ferramenta</label>
+        <input
+          type="search"
+          id="domain-search"
+          class="domain-listing-search"
+          placeholder="Buscar ferramenta…"
+          autocomplete="off"
+          maxlength="100"
+        />
+      </div>
+
+      <p id="domain-listing-status" class="domain-listing-status" role="status" aria-live="polite"></p>
+
+      <ul id="domain-listing-grid" class="domain-listing-grid" aria-label="Ferramentas com guia de domínio"></ul>
+    </div>
+  </main>
+
+  <footer id="contato" class="site-footer site-footer--split" role="contentinfo">
+    <div class="wrap site-footer__inner">
+      <p class="site-footer__line">Projeto de Extensão HelpProf</p>
+      <p class="site-footer__line">
+        <a class="site-footer__link" href="mailto:sugestoes@helpprof.local">Mande uma sugestão (E-mail)</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/hp-config.js"></script>
+  <script src="js/tool-assets.js"></script>
+  <script src="js/listagem-dominios.js"></script>
+</body>
+</html>

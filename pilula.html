@@ -22,7 +22,7 @@
         <ul class="site-nav__list">
           <li><a class="site-nav__link" href="index.html#inicio">Início</a></li>
           <li><a class="site-nav__link" href="listagem.html">Pílulas</a></li>
-          <li><a class="site-nav__link" href="index.html#perguntas-recentes">Perguntas Recentes</a></li>
+          <li><a class="site-nav__link" href="listagem-dominios.html">Guias de Domínio</a></li>
           <li><a class="site-nav__link" href="index.html#contato">Contato</a></li>
           <li><a class="site-nav__link" href="admin.html">Admin</a></li>
         </ul>
@@ -110,10 +110,14 @@
             hidden
             data-panel="detalhe"
           >
-            <h2 class="tab-panel__heading">Modo Domínio</h2>
+            <h2 class="tab-panel__heading" hidden>Modo Domínio</h2>
             <p class="tab-panel__lede tab-panel__lede-dynamic">
-              Guia aprofundado em breve. Use a aba de passos enquanto isso.
+              Carregando guia aprofundado…
             </p>
+            <div class="slide-embed domain-slide-embed" id="domain-slide-wrap" hidden style="display:none" aria-label="Apresentação de domínio"></div>
+            <div id="domain-guide-content" class="pill-content-area">
+              <p class="steps-list__item steps-list__item--muted">Carregando conteúdo de domínio…</p>
+            </div>
 
             <div class="related-pills">
               <div class="related-pills__head hp-section__heading-row hp-section__heading-row--compact">
@@ -133,7 +137,8 @@
               </div>
               <p id="pill-related-empty" class="related-pills__empty" hidden>Não há outras pílulas desta ferramenta no momento.</p>
               <div class="related-pills__footer">
-                <a class="btn-pill" href="index.html#inicio">Voltar ao início</a>
+                <a class="btn-pill domain-view-hidden" href="index.html#inicio">Voltar ao início</a>
+                <a class="btn-pill domain-view-only" href="listagem-dominios.html">← Todos os Guias</a>
               </div>
             </div>
           </div>

@@ -147,10 +147,17 @@ class DomainGuidePublicOut(BaseModel):
 
 
 class DomainGuideCreateIn(BaseModel):
-    tool_category: str = Field(..., max_length=120)
+    tool_category: str = Field(..., max_length=60)
     title: str = Field(..., max_length=500)
     deep_content: str
     slides_embed: str | None = None
+
+    @field_validator("tool_category", mode="before")
+    @classmethod
+    def normalize_domain_tool_category(cls, v: Any) -> str:
+        if not isinstance(v, str):
+            raise TypeError("tool_category deve ser string.")
+        return str(v).strip().upper()
 
 
 class DomainGuideUpdateIn(BaseModel):

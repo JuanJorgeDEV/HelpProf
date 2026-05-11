@@ -1,5 +1,7 @@
 /**
  * Visualização dinâmica de pílula: pilula.html?id=<uuid>
+ * Modo domínio: pilula.html?category=<SLUG>&view=domain
+ *               pilula.html?id=<uuid>&view=domain
  * Requer js/hp-config.js e js/tool-assets.js antes deste script.
  * Usa marked.js (CDN) para renderizar Markdown completo.
  */
@@ -20,11 +22,28 @@
   function qs(sel) { return document.getElementById(sel); }
   function param(name) { return new URLSearchParams(window.location.search).get(name); }
 
+  /* ── Modo domínio ──────────────────────────────────────────────────────── */
+  var IS_DOMAIN_VIEW = param("view") === "domain";
+
+  function enterDomainView() {
+    document.body.classList.add("is-domain-view");
+    /* Mostra diretamente o painel de domínio */
+    var panelPassos  = qs("panel-passos");
+    var panelDetalhe = qs("panel-detalhe");
+    var tabSwitcher  = document.querySelector(".tab-switcher");
+    var domainHeading = document.querySelector(".tab-panel__heading");
+    if (panelPassos)  { panelPassos.hidden = true;  panelPassos.setAttribute("aria-hidden", "true"); }
+    if (panelDetalhe) { panelDetalhe.hidden = false; panelDetalhe.removeAttribute("aria-hidden"); }
+    if (tabSwitcher)  tabSwitcher.hidden = true;
+    if (domainHeading) domainHeading.hidden = true;
+  }
+
   /* ── Slide embed ─────────────────────────────────────────────────────── */
-  function setSlideEmbed(url) {
-    var wrap = qs("pill-slide-wrap");
+  function setSlideEmbed(url, containerId) {
+    var id   = containerId || "pill-slide-wrap";
+    var wrap = qs(id);
     if (!wrap) return;
-    var src = coerceSlidesEmbedUrl(url);
+    var src   = coerceSlidesEmbedUrl(url);
     var valid = src && SLIDES_RE.test(src);
     if (!valid) {
       wrap.hidden = true;
@@ -38,7 +57,7 @@
     var iframe = document.createElement("iframe");
     iframe.src = src;
     iframe.setAttribute("frameborder", "0");
-    iframe.width = "100%";
+    iframe.width  = "100%";
     iframe.height = "100%";
     iframe.allowFullscreen = true;
     wrap.appendChild(iframe);
@@ -49,9 +68,8 @@
     if (typeof window.marked !== "undefined") {
       return window.marked.parse(md || "");
     }
-    /* fallback simples: converte # → h3, - / * / 1. → <li> */
-    var lines = (md || "").split(/\r?\n/);
-    var html = [];
+    var lines  = (md || "").split(/\r?\n/);
+    var html   = [];
     var inList = false;
     var listTag = "ul";
 
@@ -60,10 +78,10 @@
     }
 
     lines.forEach(function (raw) {
-      var line = raw.trimEnd();
-      var h = line.match(/^(#{1,4})\s+(.+)/);
+      var line    = raw.trimEnd();
+      var h       = line.match(/^(#{1,4})\s+(.+)/);
       var ordered = line.match(/^\s*\d+\.\s+(.+)/);
-      var bullet = line.match(/^\s*[-*+]\s+(.+)/);
+      var bullet  = line.match(/^\s*[-*+]\s+(.+)/);
 
       if (h) {
         closeList();
@@ -98,15 +116,14 @@
     container.innerHTML = renderMarkdown(md);
   }
 
-  /* ── Brand bar (categoria dinâmica) ─────────────────────────────────── */
+  /* ── Brand bar ───────────────────────────────────────────────────────── */
   function doApplyBrand(brand) {
-    var bar = qs("pill-brand-bar");
+    var bar    = qs("pill-brand-bar");
     var logoEl = qs("pill-brand-logo");
-    var lbl = qs("pill-brand-label");
+    var lbl    = qs("pill-brand-label");
     if (!bar) return;
     var color = brand.color || "#6366f1";
     bar.hidden = false;
-    /* inline style garante funcionar sem suporte a color-mix() */
     bar.style.setProperty("--pill-brand-color", color);
     bar.style.background = hexAlpha(color, 0.11);
     bar.style.borderLeftColor = color;
@@ -118,7 +135,6 @@
   }
 
   function hexAlpha(hex, alpha) {
-    /* Converte #rrggbb → rgba() para background de suporte universal */
     var m = String(hex).match(/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
     if (!m) return "rgba(99,102,241," + alpha + ")";
     return "rgba(" + parseInt(m[1], 16) + "," + parseInt(m[2], 16) + "," + parseInt(m[3], 16) + "," + alpha + ")";
@@ -144,19 +160,53 @@
       .catch(fromStatic);
   }
 
-  /* ── Painel Domínio fallback ─────────────────────────────────────────── */
+  /* ── Painel Domínio ──────────────────────────────────────────────────── */
   function setDomainFallback(slug) {
     var el = document.querySelector(".tab-panel__lede-dynamic");
     if (!el) return;
     var b = typeof window.resolveToolBrand === "function" ? window.resolveToolBrand(slug) : { label: slug };
-    el.textContent = "Guia aprofundado sobre " + (b.label || slug) + ". Quando houver conteúdo cadastrado no HelpProf, ele aparecerá aqui.";
+    el.textContent = "Guia aprofundado sobre " + (b.label || slug) + ".";
+  }
+
+  function loadDomainGuide(apiBase, slug) {
+    var lede = document.querySelector(".tab-panel__lede-dynamic");
+    var box  = qs("domain-guide-content");
+    var title = qs("dual-guide-title");
+    if (!box) return;
+    box.innerHTML = "";
+    if (!slug) {
+      box.innerHTML = '<p class="steps-list__item steps-list__item--muted">Categoria não informada para carregar o guia.</p>';
+      return;
+    }
+    fetch(apiBase + "/domain-guides/by-category/" + encodeURIComponent(slug), {
+      headers: { Accept: "application/json" },
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (guide) {
+        if (!guide) {
+          if (lede) lede.textContent = "Ainda não há guia de domínio cadastrado para esta ferramenta.";
+          box.innerHTML = '<p class="steps-list__item steps-list__item--muted">Guia de domínio ainda não cadastrado.</p>';
+          return;
+        }
+        var guideTitle = guide.title || ("Guia de domínio — " + slug);
+        if (lede) lede.textContent = guideTitle;
+        if (IS_DOMAIN_VIEW && title) {
+          title.textContent = guideTitle;
+          document.title = "HelpProf — " + guideTitle;
+        }
+        box.innerHTML = renderMarkdown(guide.deep_content || "");
+        if (guide.slides_embed) setSlideEmbed(guide.slides_embed, "domain-slide-wrap");
+      })
+      .catch(function () {
+        box.innerHTML = '<p class="steps-list__item steps-list__item--muted">Não foi possível carregar o guia agora.</p>';
+      });
   }
 
   function recordView(apiBase, id) {
     fetch(apiBase + "/pills/" + encodeURIComponent(id) + "/view", { method: "POST" }).catch(function () {});
   }
 
-  /** Cards do carrossel «Relacionadas» (mesmo padrão visual da home, mais compactos). */
+  /* ── Cards do carrossel «Relacionadas» ───────────────────────────────── */
   function buildRelatedCard(pill) {
     var brand = typeof window.resolveToolBrand === "function"
       ? window.resolveToolBrand((pill.tool_category || "").toUpperCase())
@@ -188,103 +238,88 @@
     }
     if (brand.color) iconDiv.style.background = hexAlpha(brand.color, 0.12);
 
-    var title = document.createElement("h4");
-    title.className = "pill-card__title";
-    title.textContent = pill.title;
+    var titleEl = document.createElement("h4");
+    titleEl.className = "pill-card__title";
+    titleEl.textContent = pill.title;
 
     var meta = document.createElement("p");
     meta.className = "pill-card__meta";
     meta.textContent = (brand.label || pill.tool_category || "").replace(/_/g, " ");
 
     a.appendChild(iconDiv);
-    a.appendChild(title);
+    a.appendChild(titleEl);
     a.appendChild(meta);
     li.appendChild(a);
     return li;
   }
 
-  function loadRelatedPills(apiBase, pill) {
-    var track = qs("pill-related-track");
-    var emptyEl = qs("pill-related-empty");
+  function loadRelatedPills(apiBase, slugOrPill, excludeId) {
+    var track      = qs("pill-related-track");
+    var emptyEl    = qs("pill-related-empty");
     var carouselEl = document.querySelector(".pill-carousel--related");
-    var seeMore = qs("pill-related-see-more");
-    var slug = (pill.tool_category || "").trim().toUpperCase();
+    var seeMore    = qs("pill-related-see-more");
+
+    var slug = typeof slugOrPill === "string"
+      ? slugOrPill.trim().toUpperCase()
+      : (slugOrPill.tool_category || "").trim().toUpperCase();
 
     if (seeMore) {
       seeMore.href = slug
-        ? "listagem.html?tool_category=" + encodeURIComponent(slug)
+        ? "listagem.html?categoria=" + encodeURIComponent(slug)
         : "listagem.html";
     }
 
     if (!track || !apiBase || !slug) {
-      if (emptyEl) {
-        emptyEl.hidden = false;
-        emptyEl.textContent = "Categoria não definida — não foi possível sugerir pílulas relacionadas.";
-      }
+      if (emptyEl) { emptyEl.hidden = false; emptyEl.textContent = "Categoria não definida."; }
       if (carouselEl) carouselEl.hidden = true;
       return;
     }
 
-    var url =
-      apiBase +
-      "/pills?tool_category=" +
-      encodeURIComponent(slug) +
-      "&exclude_id=" +
-      encodeURIComponent(pill.id) +
-      "&limit=5";
+    var url = apiBase + "/pills?tool_category=" + encodeURIComponent(slug) + "&limit=8";
+    if (excludeId) url += "&exclude_id=" + encodeURIComponent(excludeId);
 
     fetch(url, { headers: { Accept: "application/json" } })
-      .then(function (r) {
-        return r.ok ? r.json() : [];
-      })
+      .then(function (r) { return r.ok ? r.json() : []; })
       .then(function (rows) {
         if (!Array.isArray(rows)) rows = [];
         track.innerHTML = "";
         if (rows.length === 0) {
-          if (emptyEl) {
-            emptyEl.hidden = false;
-            emptyEl.textContent = "Não há outras pílulas desta ferramenta no momento.";
-          }
+          if (emptyEl) { emptyEl.hidden = false; emptyEl.textContent = "Não há pílulas desta ferramenta no momento."; }
           if (carouselEl) carouselEl.hidden = true;
           return;
         }
         if (emptyEl) emptyEl.hidden = true;
         if (carouselEl) carouselEl.hidden = false;
-        rows.forEach(function (p) {
-          track.appendChild(buildRelatedCard(p));
-        });
+        rows.forEach(function (p) { track.appendChild(buildRelatedCard(p)); });
         if (typeof window.HP_bindCarousels === "function") window.HP_bindCarousels();
       })
       .catch(function () {
         track.innerHTML = "";
-        if (emptyEl) {
-          emptyEl.hidden = false;
-          emptyEl.textContent = "Não foi possível carregar sugestões agora.";
-        }
+        if (emptyEl) { emptyEl.hidden = false; emptyEl.textContent = "Não foi possível carregar sugestões agora."; }
         if (carouselEl) carouselEl.hidden = true;
       });
   }
 
   function showError(msg) {
     var main = qs("conteudo-principal");
-    if (main) main.innerHTML = '<div class="wrap main__inner"><p class="tab-panel__lede" style="padding:2rem">' + (msg || "Informe <code>?id=</code> na URL.") + "</p></div>";
+    if (main) main.innerHTML = '<div class="wrap main__inner"><p class="tab-panel__lede" style="padding:2rem">' + (msg || "Informe <code>?id=</code> ou <code>?category=</code> na URL.") + "</p></div>";
   }
 
-  /* ── Bootstrap ───────────────────────────────────────────────────────── */
-  function boot() {
-    var cfg = window.HP_CONFIG;
-    if (!cfg || !cfg.apiBase) { showError("Configure <code>js/hp-config.js</code>."); return; }
-    var id = param("id");
-    if (!id) { showError(); return; }
-
-    /* Carregar marked.js antes de buscar o conteúdo */
-    var markedScript = document.createElement("script");
-    markedScript.src = "https://cdn.jsdelivr.net/npm/marked@12/marked.min.js";
-    markedScript.onload = function () { fetchPill(cfg, id); };
-    markedScript.onerror = function () { fetchPill(cfg, id); }; /* fallback manual */
-    document.head.appendChild(markedScript);
+  /* ── Modo: domínio por categoria (sem id de pílula) ─────────────────── */
+  function bootDomainByCategory(cfg, slug) {
+    enterDomainView();
+    var titleEl = qs("dual-guide-title");
+    if (titleEl) {
+      var b = typeof window.resolveToolBrand === "function" ? window.resolveToolBrand(slug) : { label: slug };
+      titleEl.textContent = "Guia de Domínio — " + (b.label || slug);
+      document.title = "HelpProf — " + titleEl.textContent;
+    }
+    applyDynamicBrand(slug, cfg.apiBase);
+    loadDomainGuide(cfg.apiBase, slug);
+    loadRelatedPills(cfg.apiBase, slug, null);
   }
 
+  /* ── Modo: pílula normal (com ou sem view=domain) ────────────────────── */
   function fetchPill(cfg, id) {
     fetch(cfg.apiBase + "/pills/" + encodeURIComponent(id), { headers: { Accept: "application/json" } })
       .then(function (r) {
@@ -299,10 +334,44 @@
         setSlideEmbed(pill.slides_url);
         renderContent(pill.survival_content);
         setDomainFallback(pill.tool_category);
-        loadRelatedPills(cfg.apiBase, pill);
+        loadDomainGuide(cfg.apiBase, (pill.tool_category || "").trim().toUpperCase());
+        loadRelatedPills(cfg.apiBase, pill, id);
         recordView(cfg.apiBase, id);
+        if (IS_DOMAIN_VIEW) enterDomainView();
       })
       .catch(function (err) { showError(err && err.message ? err.message : "Erro ao carregar."); });
+  }
+
+  /* ── Bootstrap ───────────────────────────────────────────────────────── */
+  function boot() {
+    var cfg = window.HP_CONFIG;
+    if (!cfg || !cfg.apiBase) { showError("Configure <code>js/hp-config.js</code>."); return; }
+
+    var id       = param("id");
+    var category = (param("category") || "").trim().toUpperCase();
+
+    /* Carregar marked.js antes de buscar conteúdo */
+    var markedScript = document.createElement("script");
+    markedScript.src = "https://cdn.jsdelivr.net/npm/marked@12/marked.min.js";
+    markedScript.onload = function () {
+      if (!id && category && IS_DOMAIN_VIEW) {
+        bootDomainByCategory(cfg, category);
+      } else if (id) {
+        fetchPill(cfg, id);
+      } else {
+        showError();
+      }
+    };
+    markedScript.onerror = function () {
+      if (!id && category && IS_DOMAIN_VIEW) {
+        bootDomainByCategory(cfg, category);
+      } else if (id) {
+        fetchPill(cfg, id);
+      } else {
+        showError();
+      }
+    };
+    document.head.appendChild(markedScript);
   }
 
   if (document.readyState === "loading") {

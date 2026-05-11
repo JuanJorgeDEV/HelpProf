@@ -60,6 +60,17 @@
     btnCatCancel: $("btn-cat-cancel"),
     catsTbody: $("cats-tbody"),
     btnRefreshCats: $("btn-refresh-cats"),
+    // domain guides tab
+    guideForm: $("guide-form"),
+    guideFormTitle: $("guide-form-title"),
+    guideCategory: $("guide-category"),
+    guideTitle: $("guide-title"),
+    guideContent: $("guide-content"),
+    guideSlides: $("guide-slides"),
+    btnGuideSubmit: $("btn-guide-submit"),
+    btnGuideReset: $("btn-guide-reset"),
+    guidesTbody: $("guides-tbody"),
+    btnRefreshGuides: $("btn-refresh-guides"),
   };
 
   // ── utilidades ───────────────────────────────────────────────────────────
@@ -198,8 +209,10 @@
     ui.panelSection.hidden = false;
     if (user && ui.userLabel) ui.userLabel.textContent = user.email || "";
     loadCategories().then(function () {
+      syncGuideCategorySelect();
       refreshPills();
       refreshCats();
+      refreshGuides();
     });
   }
 
@@ -258,6 +271,19 @@
         label: c.name || c.slug,
       };
     });
+  }
+
+  function syncGuideCategorySelect() {
+    if (!ui.guideCategory) return;
+    var current = (ui.guideCategory.value || "").trim().toUpperCase();
+    ui.guideCategory.innerHTML = '<option value="">Selecione uma categoria…</option>';
+    categoriesCache.forEach(function (c) {
+      var o = document.createElement("option");
+      o.value = c.slug;
+      o.textContent = c.name + " (" + c.slug + ")";
+      ui.guideCategory.appendChild(o);
+    });
+    if (current) ui.guideCategory.value = current;
   }
 
   var catDropdownVisible = false;
@@ -480,6 +506,7 @@
     try {
       categoriesCache = await apiFetch("/categories?limit=500");
       updateToolAssets();
+      syncGuideCategorySelect();
       renderCatsTable(categoriesCache);
     } catch (e) { setStatus(e.message, true); }
   }
@@ -586,6 +613,137 @@
   ui.btnRefreshCats.addEventListener("click", function () {
     refreshCats().catch(function (e) { setStatus(e.message, true); });
   });
+
+  // ── guias de domínio (1:1 por categoria) ─────────────────────────────────
+  function resetGuideForm() {
+    if (!ui.guideForm) return;
+    ui.guideTitle.value = "";
+    ui.guideContent.value = "";
+    ui.guideSlides.value = "";
+    if (ui.guideFormTitle) {
+      ui.guideFormTitle.textContent = "Guia de domínio por ferramenta (1:1)";
+    }
+  }
+
+  async function loadGuideByCategory(slug) {
+    if (!slug) {
+      resetGuideForm();
+      return;
+    }
+    setStatus("Carregando guia da categoria " + slug + "…");
+    try {
+      var guide = await apiFetch("/admin/domain-guides/by-category/" + encodeURIComponent(slug));
+      ui.guideTitle.value = guide.title || "";
+      ui.guideContent.value = guide.deep_content || "";
+      ui.guideSlides.value = guide.slides_embed || "";
+      if (ui.guideFormTitle) ui.guideFormTitle.textContent = "Editar guia de domínio (" + slug + ")";
+      setStatus("Guia carregado para edição.");
+    } catch (e) {
+      ui.guideTitle.value = "Guia de domínio — " + slug;
+      ui.guideContent.value = "";
+      ui.guideSlides.value = "";
+      if (ui.guideFormTitle) ui.guideFormTitle.textContent = "Novo guia para " + slug;
+      setStatus("Nenhum guia encontrado para " + slug + ". Preencha e salve.");
+    }
+  }
+
+  async function refreshGuides() {
+    if (!ui.guidesTbody) return;
+    try {
+      var rows = await apiFetch("/admin/domain-guides?limit=500");
+      ui.guidesTbody.innerHTML = "";
+      if (!rows.length) {
+        var tr0 = document.createElement("tr");
+        tr0.innerHTML = '<td colspan="4" style="color:var(--text-muted);font-style:italic">Nenhum guia cadastrado.</td>';
+        ui.guidesTbody.appendChild(tr0);
+        return;
+      }
+      rows.forEach(function (g) {
+        var tr = document.createElement("tr");
+        var slideIcon = g.slides_embed
+          ? '<a href="' + esc(g.slides_embed) + '" target="_blank" rel="noopener">▶</a>'
+          : "—";
+        tr.innerHTML =
+          "<td><strong>" + esc(g.tool_category) + "</strong></td>" +
+          "<td>" + esc(g.title) + "</td>" +
+          "<td>" + slideIcon + "</td>" +
+          '<td><button class="btn-ghost" data-action="edit-guide" data-slug="' + esc(g.tool_category) + '">Editar</button></td>';
+        ui.guidesTbody.appendChild(tr);
+      });
+    } catch (e) {
+      setStatus(e.message, true);
+    }
+  }
+
+  if (ui.guideCategory) {
+    ui.guideCategory.addEventListener("change", function () {
+      var slug = (ui.guideCategory.value || "").trim().toUpperCase();
+      loadGuideByCategory(slug).catch(function (e) { setStatus(e.message, true); });
+    });
+  }
+
+  if (ui.btnGuideReset) {
+    ui.btnGuideReset.addEventListener("click", function () {
+      resetGuideForm();
+    });
+  }
+
+  if (ui.guideForm) {
+    ui.guideForm.addEventListener("submit", async function (ev) {
+      ev.preventDefault();
+      var slug = (ui.guideCategory.value || "").trim().toUpperCase();
+      if (!slug) {
+        setStatus("Selecione uma categoria para salvar o guia.", true);
+        return;
+      }
+      var slides = (ui.guideSlides.value || "").trim();
+      if (slides) {
+        try {
+          slides = sanitizeGoogleSlidesUrl(slides);
+          ui.guideSlides.value = slides;
+        } catch (err) {
+          setStatus(err && err.message ? err.message : "Slides inválido.", true);
+          return;
+        }
+      }
+      var body = {
+        tool_category: slug,
+        title: ui.guideTitle.value.trim(),
+        deep_content: ui.guideContent.value,
+        slides_embed: slides || null,
+      };
+      setStatus("Salvando guia…");
+      try {
+        await apiFetch("/admin/domain-guides/by-category/" + encodeURIComponent(slug), {
+          method: "PUT",
+          body: JSON.stringify(body),
+        });
+        setStatus("Guia salvo com sucesso.");
+        refreshGuides();
+        loadGuideByCategory(slug);
+      } catch (e) {
+        setStatus(e.message, true);
+      }
+    });
+  }
+
+  if (ui.guidesTbody) {
+    ui.guidesTbody.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-action='edit-guide']");
+      if (!btn) return;
+      var slug = (btn.dataset.slug || "").toUpperCase();
+      if (ui.guideCategory) ui.guideCategory.value = slug;
+      loadGuideByCategory(slug).catch(function (err) { setStatus(err.message, true); });
+      var tab = document.querySelector('.adm-tab[data-tab="guides"]');
+      if (tab) tab.click();
+    });
+  }
+
+  if (ui.btnRefreshGuides) {
+    ui.btnRefreshGuides.addEventListener("click", function () {
+      refreshGuides().catch(function (e) { setStatus(e.message, true); });
+    });
+  }
 
   // ── bootstrap ────────────────────────────────────────────────────────────
   initSupabase().catch(function (e) {

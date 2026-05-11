@@ -22,6 +22,7 @@
         <ul class="site-nav__list">
           <li><a class="site-nav__link" href="index.html#inicio">Início</a></li>
           <li><a class="site-nav__link" href="listagem.html" aria-current="page">Pílulas</a></li>
+          <li><a class="site-nav__link" href="listagem-dominios.html">Guias de Domínio</a></li>
           <li><a class="site-nav__link" href="index.html#contato">Contato</a></li>
           <li><a class="site-nav__link" href="admin.html" style="font-weight:600;color:#8b5cf6;">Admin</a></li>
         </ul>
@@ -29,45 +30,88 @@
     </div>
   </header>
 
-  <main id="conteudo-principal" class="main main--home main--listing">
+  <main id="conteudo-principal" class="main main--home main--listing main--listing-dense">
     <div class="wrap main__inner">
-      <header class="listing-hero">
-        <h1 class="listing-hero__title">Pílulas</h1>
-        <p class="listing-hero__lede">Filtre por ferramenta ou busque pelo título.</p>
+      <header class="listing-hero listing-hero--dense">
+        <h1 class="listing-hero__title">Biblioteca de Pílulas</h1>
+        <p class="listing-hero__lede">Escolha uma ferramenta e encontre o passo a passo.</p>
       </header>
 
-      <form id="listing-filters" class="listing-filters glass-card" role="search" action="listagem.html" method="get">
-        <div class="listing-filters__row">
-          <label class="listing-filters__label" for="listing-q">Busca</label>
-          <input
-            id="listing-q"
-            name="q"
-            type="search"
-            class="listing-filters__input"
-            placeholder="Ex.: OneDrive, planilha, SED…"
-            autocomplete="off"
-            maxlength="200"
-          />
+      <section class="listing-layout" aria-label="Filtros e resultados">
+        <div class="listing-mobile-toolbar">
+          <button
+            type="button"
+            class="listing-filters-toggle"
+            id="listing-filters-toggle"
+            aria-expanded="false"
+            aria-controls="listing-sidebar"
+          >
+            Filtros
+          </button>
         </div>
-        <div class="listing-filters__row">
-          <label class="listing-filters__label" for="listing-category">Ferramenta</label>
-          <select id="listing-category" name="tool_category" class="listing-filters__select" aria-label="Filtrar por ferramenta">
-            <option value="">Todas as ferramentas</option>
-          </select>
+
+        <aside class="listing-sidebar glass-card" id="listing-sidebar" aria-label="Filtros">
+          <h2 class="listing-sidebar__heading">Refinar busca</h2>
+          <form id="listing-filters" class="listing-filters" role="search" action="listagem.html" method="get">
+            <div class="listing-filters__row">
+              <label class="listing-filters__label" for="listing-q">Busca</label>
+              <input
+                id="listing-q"
+                name="q"
+                type="search"
+                class="listing-filters__input"
+                placeholder="Ex.: OneDrive, planilha, SED…"
+                autocomplete="off"
+                maxlength="200"
+              />
+            </div>
+            <div class="listing-filters__row listing-filters__row--tool">
+              <label class="listing-filters__label" for="listing-category-q">Ferramenta</label>
+              <div class="listing-combobox">
+                <input
+                  type="text"
+                  id="listing-category-q"
+                  class="listing-filters__input"
+                  autocomplete="off"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-controls="listing-category-listbox"
+                  aria-expanded="false"
+                  aria-label="Buscar ferramenta para filtrar"
+                  placeholder="Digite para buscar…"
+                />
+                <input type="hidden" id="listing-category" name="categoria" value="" />
+                <ul class="listing-combobox__list" id="listing-category-listbox" role="listbox" hidden></ul>
+              </div>
+              <div id="listing-category-tag-wrap" class="listing-category-tag-wrap" hidden>
+                <span class="listing-category-tag" id="listing-category-tag-label" aria-live="polite"></span>
+                <button type="button" class="listing-category-tag-remove" id="listing-category-remove" aria-label="Remover filtro de ferramenta">
+                  Remover
+                </button>
+              </div>
+            </div>
+            <div class="listing-filters__actions">
+              <button type="submit" class="listing-filters__submit">Aplicar</button>
+              <a href="listagem.html" class="listing-filters__reset">Limpar filtros</a>
+            </div>
+          </form>
+        </aside>
+
+        <div class="listing-results-wrap">
+          <p id="listing-status" class="listing-status" role="status" aria-live="polite"></p>
+          <ul id="listing-results" class="listing-grid listing-grid--dense" aria-label="Resultados"></ul>
+
+          <article class="listing-lume-card glass-card" id="listing-lume-card">
+            <h2 class="listing-lume-card__title">Nao achou exatamente o que precisava?</h2>
+            <p class="listing-lume-card__text">Peça para a Lume orientar sua situação em linguagem simples e prática.</p>
+            <a class="btn-pill" href="index.html#busca-lume">Perguntar para a Lume</a>
+          </article>
+
+          <div class="listing-load-more-wrap">
+            <button type="button" id="listing-load-more" class="listing-load-more" hidden>Carregar mais</button>
+          </div>
         </div>
-        <div class="listing-filters__actions">
-          <button type="submit" class="listing-filters__submit">Aplicar filtros</button>
-          <a href="listagem.html" class="listing-filters__reset">Limpar</a>
-        </div>
-      </form>
-
-      <p id="listing-status" class="listing-status" role="status" aria-live="polite"></p>
-
-      <ul id="listing-results" class="listing-grid" aria-label="Resultados"></ul>
-
-      <div class="listing-load-more-wrap">
-        <button type="button" id="listing-load-more" class="listing-load-more" hidden>Carregar mais</button>
-      </div>
+      </section>
     </div>
   </main>
 

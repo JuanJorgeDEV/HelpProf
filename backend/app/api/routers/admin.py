@@ -48,6 +48,16 @@ def _first_row(res: Any) -> dict | None:
     return None
 
 
+def _domain_guide_from_row(r: dict) -> DomainGuidePublicOut:
+    return DomainGuidePublicOut(
+        id=r["id"],
+        tool_category=r["tool_category"],
+        title=r["title"],
+        deep_content=r["deep_content"],
+        slides_embed=r.get("slides_embed"),
+    )
+
+
 @router.get("/pills", response_model=list[PillAdminOut], dependencies=[_auth])
 def list_pills(
     include_deleted: bool = Query(default=False, description="Se true, inclui pílulas arquivadas (soft delete)."),
@@ -138,6 +148,44 @@ def soft_delete_pill(pill_id: UUID) -> dict[str, str]:
 
 # --- Guias Domínio (Triad Support) -------------------------------
 
+@router.get("/domain-guides", response_model=list[DomainGuidePublicOut], dependencies=[_auth])
+def list_domain_guides(limit: int = Query(default=200, ge=1, le=500)) -> list[DomainGuidePublicOut]:
+    client = get_service_client()
+    res = supabase_call(
+        "admin_domain_guides_list",
+        lambda: client.table("domain_guides")
+        .select("id,tool_category,title,deep_content,slides_embed,updated_at")
+        .is_("deleted_at", "null")
+        .order("updated_at", desc=True)
+        .limit(limit)
+        .execute(),
+    )
+    rows = res.data or []
+    return [_domain_guide_from_row(r) for r in rows]
+
+
+@router.get("/domain-guides/by-category/{tool_category}", response_model=DomainGuidePublicOut, dependencies=[_auth])
+def get_domain_guide_by_category_admin(tool_category: str) -> DomainGuidePublicOut:
+    category = tool_category.strip().upper()
+    if not category:
+        raise HelpProfError("tool_category é obrigatório.")
+    client = get_service_client()
+    res = supabase_call(
+        "admin_domain_guide_by_category",
+        lambda: client.table("domain_guides")
+        .select("id,tool_category,title,deep_content,slides_embed")
+        .eq("tool_category", category)
+        .is_("deleted_at", "null")
+        .limit(1)
+        .maybe_single()
+        .execute(),
+    )
+    r = res.data
+    if not r:
+        raise NotFoundError("Guia não encontrado para esta ferramenta.")
+    return _domain_guide_from_row(r)
+
+
 @router.post("/domain-guides", response_model=DomainGuidePublicOut, dependencies=[_auth])
 def create_domain_guide(body: DomainGuideCreateIn) -> DomainGuidePublicOut:
     client = get_service_client()
@@ -158,13 +206,7 @@ def create_domain_guide(body: DomainGuideCreateIn) -> DomainGuidePublicOut:
     r = _first_row(res)
     if not r:
         raise InternalServerHelpProfError("Não foi possível criar o guia.")
-    return DomainGuidePublicOut(
-        id=r["id"],
-        tool_category=r["tool_category"],
-        title=r["title"],
-        deep_content=r["deep_content"],
-        slides_embed=r.get("slides_embed"),
-    )
+    return _domain_guide_from_row(r)
 
 
 @router.patch("/domain-guides/{guide_id}", response_model=DomainGuidePublicOut, dependencies=[_auth])
@@ -184,10 +226,51 @@ def update_domain_guide(guide_id: UUID, body: DomainGuideUpdateIn) -> DomainGuid
     if not rows:
         raise NotFoundError("Guia não encontrado.")
     r = rows[0]
-    return DomainGuidePublicOut(
-        id=r["id"],
-        tool_category=r["tool_category"],
-        title=r["title"],
-        deep_content=r["deep_content"],
-        slides_embed=r.get("slides_embed"),
+    return _domain_guide_from_row(r)
+
+
+@router.put("/domain-guides/by-category/{tool_category}", response_model=DomainGuidePublicOut, dependencies=[_auth])
+def upsert_domain_guide_by_category(tool_category: str, body: DomainGuideCreateIn) -> DomainGuidePublicOut:
+    category = tool_category.strip().upper()
+    if not category:
+        raise HelpProfError("tool_category é obrigatório.")
+    if body.tool_category != category:
+        raise HelpProfError("tool_category do path e do body devem ser iguais.")
+    client = get_service_client()
+    existing_res = supabase_call(
+        "admin_domain_guide_upsert_lookup",
+        lambda: client.table("domain_guides")
+        .select("id")
+        .eq("tool_category", category)
+        .is_("deleted_at", "null")
+        .limit(1)
+        .maybe_single()
+        .execute(),
     )
+    existing = existing_res.data
+    payload = {
+        "tool_category": category,
+        "title": body.title,
+        "deep_content": body.deep_content,
+        "slides_embed": body.slides_embed,
+        "deleted_at": None,
+    }
+    if existing and existing.get("id"):
+        res = supabase_call(
+            "admin_domain_guide_upsert_update",
+            lambda: client.table("domain_guides")
+            .update(payload)
+            .eq("id", str(existing["id"]))
+            .execute(),
+        )
+    else:
+        res = supabase_call(
+            "admin_domain_guide_upsert_insert",
+            lambda: client.table("domain_guides")
+            .insert(payload)
+            .execute(),
+        )
+    r = _first_row(res)
+    if not r:
+        raise InternalServerHelpProfError("Não foi possível salvar o guia.")
+    return _domain_guide_from_row(r)

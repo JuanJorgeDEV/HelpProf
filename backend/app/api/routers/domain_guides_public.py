@@ -13,7 +13,7 @@ router = APIRouter(prefix="/domain-guides", tags=["domain-guides"])
 
 @router.get("/by-category/{tool_category}", response_model=DomainGuidePublicOut)
 def get_by_category(tool_category: str) -> DomainGuidePublicOut:
-    category = unquote(tool_category).strip()
+    category = unquote(tool_category).strip().upper()
     client = get_service_client()
     res = supabase_call(
         "domain_guides_public",
@@ -21,8 +21,6 @@ def get_by_category(tool_category: str) -> DomainGuidePublicOut:
         .select("id,tool_category,title,deep_content,slides_embed")
         .eq("tool_category", category)
         .is_("deleted_at", "null")
-        .order("updated_at", desc=True)
-        .limit(1)
         .maybe_single()
         .execute(),
     )
