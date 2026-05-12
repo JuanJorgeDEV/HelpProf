@@ -1,4 +1,3 @@
 backend/.env
-js/hp-config.js
 *.local.js
 .cursor/
