@@ -55,6 +55,7 @@
     catName: $("cat-name"),
     catLogoUrl: $("cat-logo-url"),
     catBrandColor: $("cat-brand-color"),
+    catGroupTag: $("cat-group-tag"),
     catSortOrder: $("cat-sort-order"),
     btnCatSubmit: $("btn-cat-submit"),
     btnCatCancel: $("btn-cat-cancel"),
@@ -263,13 +264,10 @@
   }
 
   function updateToolAssets() {
-    if (!window.TOOL_ASSETS) window.TOOL_ASSETS = {};
     categoriesCache.forEach(function (c) {
-      window.TOOL_ASSETS[c.slug] = {
-        logo: c.logo_url || "Logo.jpeg",
-        color: c.brand_color || "#6366f1",
-        label: c.name || c.slug,
-      };
+      if (typeof window.upsertToolBrand === "function") {
+        window.upsertToolBrand(c);
+      }
     });
   }
 
@@ -515,7 +513,7 @@
     ui.catsTbody.innerHTML = "";
     if (!rows.length) {
       var tr = document.createElement("tr");
-      tr.innerHTML = '<td colspan="6" style="color:var(--text-muted);font-style:italic">Nenhuma ferramenta cadastrada.</td>';
+      tr.innerHTML = '<td colspan="7" style="color:var(--text-muted);font-style:italic">Nenhuma ferramenta cadastrada.</td>';
       ui.catsTbody.appendChild(tr);
       return;
     }
@@ -527,6 +525,7 @@
       tr.innerHTML =
         "<td><strong>" + esc(c.slug) + "</strong></td>" +
         "<td>" + esc(c.name) + "</td>" +
+        "<td>" + esc(c.group_tag || "—") + "</td>" +
         '<td><span class="swatch" style="background:' + esc(c.brand_color) + '"></span>' + esc(c.brand_color) + "</td>" +
         "<td>" + logo + "</td>" +
         "<td>" + esc(c.sort_order) + "</td>" +
@@ -557,6 +556,7 @@
       ui.catName.value = cat.name;
       ui.catLogoUrl.value = cat.logo_url || "";
       ui.catBrandColor.value = cat.brand_color || "#6366f1";
+      if (ui.catGroupTag) ui.catGroupTag.value = cat.group_tag || "";
       ui.catSortOrder.value = cat.sort_order;
       ui.catFormTitle.textContent = "Editar ferramenta: " + cat.slug;
       ui.btnCatSubmit.textContent = "Salvar alterações";
@@ -570,6 +570,7 @@
     ui.catSlug.disabled = false;
     ui.catForm.reset();
     ui.catBrandColor.value = "#6366f1";
+    if (ui.catGroupTag) ui.catGroupTag.value = "";
     ui.catFormTitle.textContent = "Nova ferramenta / categoria";
     ui.btnCatSubmit.textContent = "Criar ferramenta";
     ui.btnCatCancel.hidden = true;
@@ -585,6 +586,7 @@
       if (editId) {
         var patch = {
           name: ui.catName.value.trim(),
+          group_tag: ui.catGroupTag ? (ui.catGroupTag.value.trim() || null) : null,
           logo_url: ui.catLogoUrl.value.trim() || null,
           brand_color: ui.catBrandColor.value.trim(),
           sort_order: parseInt(ui.catSortOrder.value, 10) || 0,
@@ -598,6 +600,7 @@
         var body = {
           slug: ui.catSlug.value.trim().toUpperCase(),
           name: ui.catName.value.trim(),
+          group_tag: ui.catGroupTag ? (ui.catGroupTag.value.trim() || null) : null,
           logo_url: ui.catLogoUrl.value.trim() || null,
           brand_color: ui.catBrandColor.value.trim(),
           sort_order: parseInt(ui.catSortOrder.value, 10) || 0,

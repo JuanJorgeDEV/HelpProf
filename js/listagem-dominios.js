@@ -6,6 +6,7 @@
   "use strict";
 
   var allCategories = [];
+  var activeGroup = "";
 
   function $(id) { return document.getElementById(id); }
   function cfg() { return window.HP_CONFIG || {}; }
@@ -25,14 +26,12 @@
     var slug  = String(cat.slug || "").toUpperCase();
     var name  = cat.name || slug;
     var color = cat.brand_color || "#6366f1";
-    var logo  = cat.logo_url || null;
-
-    /* resolve logo do tool-assets como fallback */
-    if (!logo && typeof window.resolveToolBrand === "function") {
-      var b = window.resolveToolBrand(slug);
-      if (b.logo && b.logo !== "Logo.jpeg") logo = b.logo;
-      if (!cat.brand_color && b.color) color = b.color;
-    }
+    var brand = typeof window.resolveToolBrand === "function"
+      ? window.resolveToolBrand(cat)
+      : { logo: cat.logo_url || "Logo.jpeg", color: color, label: name };
+    var logo = brand.logo || "Logo.jpeg";
+    color = brand.color || color;
+    name = brand.label || name;
 
     var li = document.createElement("li");
     li.className = "domain-card-wrap";
@@ -41,7 +40,7 @@
 
     var a = document.createElement("a");
     a.className = "domain-card glass-card";
-    a.href = "pilula.html?category=" + encodeURIComponent(slug) + "&view=domain";
+    a.href = "pilula.html?category=" + encodeURIComponent(slug) + "&mode=domain";
     a.setAttribute("aria-label", "Guia de domínio — " + name);
     a.style.setProperty("--domain-card-accent", color);
     a.style.borderTopColor = color;
@@ -51,7 +50,7 @@
     iconWrap.setAttribute("aria-hidden", "true");
     iconWrap.style.background = hexAlpha(color, 0.12);
 
-    if (logo) {
+    if (logo && logo !== "Logo.jpeg") {
       var img = document.createElement("img");
       img.src = logo;
       img.alt = "";
@@ -105,35 +104,91 @@
 
   function filterBySearch(q) {
     var t = String(q || "").trim().toLowerCase();
-    if (!t) return allCategories;
-    return allCategories.filter(function (c) {
+    var base = activeGroup
+      ? allCategories.filter(function (c) { return String(c.group_tag || "") === activeGroup; })
+      : allCategories;
+    if (!t) return base;
+    return base.filter(function (c) {
       var slug = String(c.slug || "").toLowerCase();
       var name = String(c.name || "").toLowerCase();
       return slug.indexOf(t) >= 0 || name.indexOf(t) >= 0;
     });
   }
 
+  function syncFilterUrl() {
+    var p = new URLSearchParams(window.location.search);
+    if (activeGroup) p.set("grupo", activeGroup);
+    else p.delete("grupo");
+    var next = p.toString() ? "listagem-dominios.html?" + p.toString() : "listagem-dominios.html";
+    window.history.replaceState({}, "", next);
+  }
+
+  function currentSearchValue() {
+    var input = $("domain-search");
+    return input ? input.value : "";
+  }
+
+  function renderFilteredGrid() {
+    renderGrid(filterBySearch(currentSearchValue()));
+  }
+
   function wireSearch() {
     var input = $("domain-search");
     if (!input) return;
     input.addEventListener("input", function () {
-      renderGrid(filterBySearch(input.value));
+      renderFilteredGrid();
     });
+  }
+
+  function wireGroupFilters() {
+    var wrap = $("domain-listing-filters");
+    if (!wrap) return;
+    wrap.addEventListener("click", function (ev) {
+      var btn = ev.target.closest("[data-group]");
+      if (!btn) return;
+      activeGroup = btn.dataset.group || "";
+      wrap.querySelectorAll(".domain-objective-chip").forEach(function (chip) {
+        chip.classList.toggle("is-active", chip === btn);
+      });
+      syncFilterUrl();
+      renderFilteredGrid();
+    });
+  }
+
+  function initGroupFromUrl() {
+    var p = new URLSearchParams(window.location.search);
+    activeGroup = (p.get("grupo") || "").trim();
+    var wrap = $("domain-listing-filters");
+    if (!wrap) return;
+    var found = false;
+    wrap.querySelectorAll(".domain-objective-chip").forEach(function (chip) {
+      var active = (chip.dataset.group || "") === activeGroup;
+      if (active) found = true;
+      chip.classList.toggle("is-active", active);
+    });
+    if (!found) {
+      activeGroup = "";
+      var all = wrap.querySelector('[data-group=""]');
+      if (all) all.classList.add("is-active");
+    }
   }
 
   async function loadCategories(apiBase) {
     setStatus("Carregando…");
     try {
-      var res = await fetch(apiBase + "/categories?limit=500", { headers: { Accept: "application/json" } });
+      var res = await fetch(apiBase + "/categories?limit=500&has_domain_guide=true", { headers: { Accept: "application/json" } });
       if (!res.ok) throw new Error("Erro " + res.status);
       var rows = await res.json();
       allCategories = Array.isArray(rows) ? rows : [];
+      if (typeof window.upsertToolBrand === "function") {
+        allCategories.forEach(function (cat) { window.upsertToolBrand(cat); });
+      }
       allCategories.sort(function (a, b) {
         var so = (a.sort_order || 0) - (b.sort_order || 0);
         if (so !== 0) return so;
         return String(a.name || "").localeCompare(String(b.name || ""), "pt");
       });
-      renderGrid(allCategories);
+      renderFilteredGrid();
     } catch (e) {
       setStatus(e && e.message ? e.message : "Falha ao carregar ferramentas.");
     }
@@ -141,7 +196,9 @@
 
   function boot() {
     var c = cfg();
+    initGroupFromUrl();
     wireSearch();
+    wireGroupFilters();
     if (c && c.apiBase) {
       loadCategories(c.apiBase);
     } else {

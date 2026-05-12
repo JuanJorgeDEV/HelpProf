@@ -1,6 +1,7 @@
 /**
  * Visualização dinâmica de pílula: pilula.html?id=<uuid>
- * Modo domínio: pilula.html?category=<SLUG>&view=domain
+ * Modo domínio: pilula.html?category=<SLUG>&mode=mastery
+ * Compat legado: pilula.html?category=<SLUG>&view=domain
  *               pilula.html?id=<uuid>&view=domain
  * Requer js/hp-config.js e js/tool-assets.js antes deste script.
  * Usa marked.js (CDN) para renderizar Markdown completo.
@@ -23,7 +24,7 @@
   function param(name) { return new URLSearchParams(window.location.search).get(name); }
 
   /* ── Modo domínio ──────────────────────────────────────────────────────── */
-  var IS_DOMAIN_VIEW = param("view") === "domain";
+  var IS_DOMAIN_VIEW = param("view") === "domain" || param("mode") === "mastery" || param("mode") === "domain";
 
   function enterDomainView() {
     document.body.classList.add("is-domain-view");
@@ -64,11 +65,18 @@
   }
 
   /* ── Markdown → HTML (marked.js com fallback manual) ────────────────── */
+  function normalizeMarkdown(md) {
+    return String(md || "")
+      .replace(/\r\n/g, "\n")
+      .replace(/^(#{1,6})([^\s#])/gm, "$1 $2");
+  }
+
   function renderMarkdown(md) {
+    var normalized = normalizeMarkdown(md);
     if (typeof window.marked !== "undefined") {
-      return window.marked.parse(md || "");
+      return window.marked.parse(normalized, { breaks: true, gfm: true });
     }
-    var lines  = (md || "").split(/\r?\n/);
+    var lines  = normalized.split(/\r?\n/);
     var html   = [];
     var inList = false;
     var listTag = "ul";
@@ -79,7 +87,7 @@
 
     lines.forEach(function (raw) {
       var line    = raw.trimEnd();
-      var h       = line.match(/^(#{1,4})\s+(.+)/);
+      var h       = line.match(/^(#{1,6})\s+(.+)/);
       var ordered = line.match(/^\s*\d+\.\s+(.+)/);
       var bullet  = line.match(/^\s*[-*+]\s+(.+)/);
 
@@ -153,9 +161,16 @@
     fetch(apiBase + "/categories/" + encodeURIComponent(slug), { headers: { Accept: "application/json" } })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (cat) {
-        cat
-          ? doApplyBrand({ logo: cat.logo_url, color: cat.brand_color, label: cat.name })
-          : fromStatic();
+        if (cat) {
+          if (typeof window.upsertToolBrand === "function") window.upsertToolBrand(cat);
+          doApplyBrand(
+            typeof window.resolveToolBrand === "function"
+              ? window.resolveToolBrand(cat)
+              : { logo: cat.logo_url, color: cat.brand_color, label: cat.name },
+          );
+        } else {
+          fromStatic();
+        }
       })
       .catch(fromStatic);
   }

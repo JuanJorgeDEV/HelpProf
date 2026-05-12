@@ -24,7 +24,7 @@ def get_by_category(tool_category: str) -> DomainGuidePublicOut:
         .maybe_single()
         .execute(),
     )
-    r = res.data
+    r = getattr(res, "data", None)
     if not r:
         raise NotFoundError("Guia de domínio não encontrado para esta ferramenta.")
     return DomainGuidePublicOut(

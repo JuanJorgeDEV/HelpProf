@@ -244,6 +244,9 @@
       if (!res.ok) return;
       var rows = await res.json();
       categories = Array.isArray(rows) ? rows : [];
+      if (typeof window.upsertToolBrand === "function") {
+        categories.forEach(function (cat) { window.upsertToolBrand(cat); });
+      }
     } catch (_) {
       categories = [];
     }

@@ -12,7 +12,7 @@ from app.services.db.supabase_client import get_service_client, supabase_call
 router = APIRouter(prefix="/categories", tags=["categories"])
 _auth = Depends(require_supabase_user)
 
-_COLS = "id,slug,name,logo_url,brand_color,sort_order"
+_COLS = "id,slug,name,group_tag,logo_url,brand_color,sort_order"
 
 
 def _row_to_out(r: dict) -> CategoryPublicOut:
@@ -20,6 +20,7 @@ def _row_to_out(r: dict) -> CategoryPublicOut:
         id=r["id"],
         slug=r["slug"],
         name=r["name"],
+        group_tag=r.get("group_tag"),
         logo_url=r.get("logo_url"),
         brand_color=r.get("brand_color") or "#6366f1",
         sort_order=int(r.get("sort_order") or 0),
@@ -38,18 +39,42 @@ def _first(res) -> dict | None:
 # ── Público (sem autenticação) ─────────────────────────────────────────────
 
 @router.get("", response_model=list[CategoryPublicOut])
-def list_categories(limit: int = Query(default=200, ge=1, le=500)) -> list[CategoryPublicOut]:
+def list_categories(
+    limit: int = Query(default=200, ge=1, le=500),
+    group_tag: str | None = Query(default=None, max_length=80),
+    has_domain_guide: bool = Query(
+        default=False,
+        description="Quando true, retorna apenas categorias com guia de domínio ativo.",
+    ),
+) -> list[CategoryPublicOut]:
     """Lista todas as categorias ordenadas por sort_order."""
     client = get_service_client()
-    res = supabase_call(
-        "categories_list",
-        lambda: client.table("categories")
-        .select(_COLS)
-        .order("sort_order", desc=False)
-        .order("name", desc=False)
-        .limit(limit)
-        .execute(),
-    )
+    guide_slugs: set[str] | None = None
+    if has_domain_guide:
+        guides_res = supabase_call(
+            "categories_with_domain_guides_lookup",
+            lambda: client.table("domain_guides")
+            .select("tool_category")
+            .is_("deleted_at", "null")
+            .execute(),
+        )
+        guide_slugs = {
+            str(r.get("tool_category") or "").strip().upper()
+            for r in (guides_res.data or [])
+            if r.get("tool_category")
+        }
+        if not guide_slugs:
+            return []
+
+    def run_query():
+        q = client.table("categories").select(_COLS)
+        if group_tag is not None and str(group_tag).strip():
+            q = q.eq("group_tag", str(group_tag).strip())
+        if guide_slugs is not None:
+            q = q.in_("slug", sorted(guide_slugs))
+        return q.order("sort_order", desc=False).order("name", desc=False).limit(limit).execute()
+
+    res = supabase_call("categories_list", run_query)
     return [_row_to_out(r) for r in (res.data or [])]
 
 
@@ -64,9 +89,10 @@ def get_category(slug: str) -> CategoryPublicOut:
         .maybe_single()
         .execute(),
     )
-    if not res.data:
+    row = getattr(res, "data", None)
+    if not row:
         raise NotFoundError("Categoria não encontrada.")
-    return _row_to_out(res.data)
+    return _row_to_out(row)
 
 
 # ── Admin (JWT obrigatório) ────────────────────────────────────────────────
@@ -130,7 +156,7 @@ def delete_category(category_id: UUID) -> dict[str, str]:
         .maybe_single()
         .execute(),
     )
-    if not cat_res.data:
+    if not getattr(cat_res, "data", None):
         raise NotFoundError("Categoria não encontrada.")
 
     supabase_call(

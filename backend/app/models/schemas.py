@@ -19,6 +19,7 @@ class CategoryPublicOut(BaseModel):
     id: UUID
     slug: str
     name: str
+    group_tag: str | None = None
     logo_url: str | None = None
     brand_color: str = "#6366f1"
     sort_order: int = 0
@@ -27,6 +28,7 @@ class CategoryPublicOut(BaseModel):
 class CategoryCreateIn(BaseModel):
     slug: str = Field(..., min_length=1, max_length=60, pattern=r"^[A-Z0-9_-]+$")
     name: str = Field(..., min_length=1, max_length=200)
+    group_tag: str | None = Field(default=None, max_length=80)
     logo_url: str | None = Field(default=None, max_length=2048)
     brand_color: str = Field(default="#6366f1", max_length=20)
     sort_order: int = Field(default=0, ge=0, le=9999)
@@ -36,12 +38,29 @@ class CategoryCreateIn(BaseModel):
     def upper_slug(cls, v: Any) -> str:
         return str(v).strip().upper()
 
+    @field_validator("group_tag", mode="before")
+    @classmethod
+    def clean_group_tag(cls, v: Any) -> str | None:
+        if v is None:
+            return None
+        s = str(v).strip()
+        return s or None
+
 
 class CategoryUpdateIn(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=200)
+    group_tag: str | None = Field(default=None, max_length=80)
     logo_url: str | None = Field(default=None, max_length=2048)
     brand_color: str | None = Field(default=None, max_length=20)
     sort_order: int | None = Field(default=None, ge=0, le=9999)
+
+    @field_validator("group_tag", mode="before")
+    @classmethod
+    def clean_group_tag(cls, v: Any) -> str | None:
+        if v is None:
+            return None
+        s = str(v).strip()
+        return s or None
 
 
 class PillPublicOut(BaseModel):

@@ -64,37 +64,29 @@
       <section id="perguntas-recentes" class="hp-section section-reveal" aria-labelledby="sala-title">
         <div class="hp-section__heading-row">
           <h2 id="sala-title" class="hp-section__title">Guias de Domínio</h2>
-          <a class="hp-section__see-more" href="listagem-dominios.html">Ver todos<span class="hp-section__see-more-arrow" aria-hidden="true"> →</span></a>
+          <a class="hp-section__see-more" id="home-domain-see-more" href="listagem-dominios.html">Ver todos<span class="hp-section__see-more-arrow" aria-hidden="true"> →</span></a>
         </div>
-        <ul class="classroom-grid" id="home-domain-grid">
-          <li>
-            <a class="classroom-card-link" href="pilula.html?category=KAHOOT&view=domain">
-              <article class="classroom-card classroom-card--kahoot glass-card">
-                <div class="classroom-card__icon" aria-hidden="true"><img src="assets/kahoot.png" alt="" width="32" height="32" style="width:32px;height:32px;object-fit:contain;border-radius:6px" /></div>
-                <h3 class="classroom-card__name">Kahoot</h3>
-                <p class="classroom-card__desc">Quizzes ao vivo para engajar turmas grandes com feedback imediato e ritmo leve.</p>
-              </article>
-            </a>
-          </li>
-          <li>
-            <a class="classroom-card-link" href="pilula.html?category=CMSP&view=domain">
-              <article class="classroom-card classroom-card--cmsp glass-card">
-                <div class="classroom-card__icon" aria-hidden="true"><img src="assets/cmsp.png" alt="" width="32" height="32" style="width:32px;height:32px;object-fit:contain;border-radius:6px" /></div>
-                <h3 class="classroom-card__name">CMSP</h3>
-                <p class="classroom-card__desc">Centro de Mídias SP — plataforma de aulas e conteúdos da rede estadual paulista.</p>
-              </article>
-            </a>
-          </li>
-          <li>
-            <a class="classroom-card-link" href="pilula.html?category=SED&view=domain">
-              <article class="classroom-card classroom-card--sed glass-card">
-                <div class="classroom-card__icon" aria-hidden="true"><img src="assets/sed.png" alt="" width="32" height="32" style="width:32px;height:32px;object-fit:contain;border-radius:6px" /></div>
-                <h3 class="classroom-card__name">SED</h3>
-                <p class="classroom-card__desc">Sistema de Gestão Escolar — frequências, diários e comunicação com a equipe gestora.</p>
-              </article>
-            </a>
+        <div class="domain-objective-filter" id="home-domain-filters" aria-label="Filtro por objetivo pedagógico">
+          <button type="button" class="domain-objective-chip is-active" data-group="">Todos</button>
+          <button type="button" class="domain-objective-chip" data-group="Gamificação">Gamificação</button>
+          <button type="button" class="domain-objective-chip" data-group="Documentos">Documentos</button>
+          <button type="button" class="domain-objective-chip" data-group="Planejamento">Planejamento</button>
+          <button type="button" class="domain-objective-chip" data-group="Interatividade">Interatividade</button>
+        </div>
+        <ul class="home-domain-grid" id="home-domain-grid" aria-label="Guias de domínio por ferramenta">
+          <li class="home-domain-grid__item">
+            <article class="home-domain-card glass-card home-domain-card--skeleton" aria-hidden="true">
+              <div class="home-domain-card__logo"></div>
+              <div class="home-domain-card__body">
+                <span class="skeleton-line" style="display:block;width:60%;height:1rem;border-radius:4px;background:rgba(0,0,0,.07)"></span>
+              </div>
+            </article>
           </li>
         </ul>
+        <article id="home-domain-empty" class="home-domain-empty glass-card" hidden>
+          <p class="home-domain-empty__text">Ainda não temos guias para este objetivo, mas posso te indicar ferramentas similares. Quer conversar?</p>
+          <a class="btn-pill" href="#busca-lume">Conversar com a Lume</a>
+        </article>
       </section>
 
       <!-- 4. Filtros operacionais -->

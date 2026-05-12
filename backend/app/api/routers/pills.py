@@ -104,7 +104,7 @@ def get_pill(pill_id: UUID) -> PillPublicOut:
         .maybe_single()
         .execute(),
     )
-    r = res.data
+    r = getattr(res, "data", None)
     if not r:
         raise NotFoundError("Pílula não encontrada.")
     return PillPublicOut(

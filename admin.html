@@ -127,9 +127,20 @@
               <input type="color" id="cat-brand-color" class="adm-color-input" value="#6366f1" />
             </label>
           </div>
-          <label class="adm-grid--narrow-field">Ordem de exibição
-            <input type="number" id="cat-sort-order" min="0" max="9999" value="0" />
-          </label>
+          <div class="adm-grid--dense-2">
+            <label>Objetivo pedagógico
+              <select id="cat-group-tag">
+                <option value="">Sem grupo</option>
+                <option value="Gamificação">Gamificação</option>
+                <option value="Documentos">Documentos</option>
+                <option value="Planejamento">Planejamento</option>
+                <option value="Interatividade">Interatividade</option>
+              </select>
+            </label>
+            <label class="adm-grid--narrow-field">Ordem de exibição
+              <input type="number" id="cat-sort-order" min="0" max="9999" value="0" />
+            </label>
+          </div>
           <div class="adm-row">
             <button type="submit" class="btn-primary" id="btn-cat-submit">Criar ferramenta</button>
             <button type="button" class="btn-secondary" id="btn-cat-cancel" hidden>Cancelar edição</button>
@@ -144,7 +155,7 @@
         </div>
         <div class="adm-table-wrap">
           <table class="adm-table">
-            <thead><tr><th>Slug</th><th>Nome</th><th>Cor</th><th>Logo</th><th>Ordem</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Slug</th><th>Nome</th><th>Objetivo</th><th>Cor</th><th>Logo</th><th>Ordem</th><th>Ações</th></tr></thead>
             <tbody id="cats-tbody"></tbody>
           </table>
         </div>

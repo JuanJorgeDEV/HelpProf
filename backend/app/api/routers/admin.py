@@ -180,7 +180,7 @@ def get_domain_guide_by_category_admin(tool_category: str) -> DomainGuidePublicO
         .maybe_single()
         .execute(),
     )
-    r = res.data
+    r = getattr(res, "data", None)
     if not r:
         raise NotFoundError("Guia não encontrado para esta ferramenta.")
     return _domain_guide_from_row(r)
@@ -247,7 +247,7 @@ def upsert_domain_guide_by_category(tool_category: str, body: DomainGuideCreateI
         .maybe_single()
         .execute(),
     )
-    existing = existing_res.data
+    existing = getattr(existing_res, "data", None)
     payload = {
         "tool_category": category,
         "title": body.title,

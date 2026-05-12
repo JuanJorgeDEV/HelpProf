@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug        VARCHAR(60) NOT NULL UNIQUE,   -- chave de negócio: "ONEDRIVE", "KAHOOT", etc.
   name        VARCHAR(200) NOT NULL,
+  group_tag   VARCHAR(80) NULL,              -- objetivo pedagógico: Gamificação, Documentos...
   logo_url    TEXT NULL,                     -- URL pública (assets/ relativo ou https://)
   brand_color VARCHAR(20) NOT NULL DEFAULT '#6366f1',
   sort_order  SMALLINT NOT NULL DEFAULT 0,
@@ -34,14 +35,14 @@ GRANT ALL ON public.categories TO service_role;
 -- 2. Seed: 7 categorias base
 -- ---------------------------------------------------------------------------
 
-INSERT INTO public.categories (slug, name, logo_url, brand_color, sort_order) VALUES
-  ('ONEDRIVE',  'OneDrive',          'assets/onedrive.png',  '#0078d4', 1),
-  ('WORD',      'Microsoft Word',    'assets/word.png',      '#2b579a', 2),
-  ('EXCEL',     'Microsoft Excel',   'assets/excel.png',     '#217346', 3),
-  ('WHATSAPP',  'WhatsApp',          'assets/whatsapp.png',  '#25D366', 4),
-  ('CANVA',     'Canva',             'assets/canva.png',     '#00C4CC', 5),
-  ('SED',       'SED',               'assets/sed.png',       '#1e40af', 6),
-  ('CMSP',      'CMSP',              'assets/cmsp.png',      '#7c3aed', 7)
+INSERT INTO public.categories (slug, name, group_tag, logo_url, brand_color, sort_order) VALUES
+  ('ONEDRIVE',  'OneDrive',          'Documentos',     'assets/onedrive.png',  '#0078d4', 1),
+  ('WORD',      'Microsoft Word',    'Documentos',     'assets/word.png',      '#2b579a', 2),
+  ('EXCEL',     'Microsoft Excel',   'Documentos',     'assets/excel.png',     '#217346', 3),
+  ('WHATSAPP',  'WhatsApp',          'Interatividade', 'assets/whatsapp.png',  '#25D366', 4),
+  ('CANVA',     'Canva',             'Planejamento',   'assets/canva.png',     '#00C4CC', 5),
+  ('SED',       'SED',               'Planejamento',   'assets/sed.png',       '#1e40af', 6),
+  ('CMSP',      'CMSP',              'Interatividade', 'assets/cmsp.png',      '#7c3aed', 7)
 ON CONFLICT (slug) DO NOTHING;
 
 -- ---------------------------------------------------------------------------
@@ -64,6 +65,7 @@ UPDATE public.domain_guides SET tool_category = upper(trim(tool_category));
 -- ---------------------------------------------------------------------------
 
 CREATE INDEX IF NOT EXISTS idx_categories_slug ON public.categories (slug);
+CREATE INDEX IF NOT EXISTS idx_categories_group_tag ON public.categories (group_tag);
 CREATE INDEX IF NOT EXISTS idx_pills_tool_category_cat ON public.pills (tool_category);
 CREATE INDEX IF NOT EXISTS idx_domain_guides_tool_category ON public.domain_guides (tool_category);
 
