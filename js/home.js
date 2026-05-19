@@ -10,6 +10,12 @@
 
   function cfg() { return window.HP_CONFIG || {}; }
 
+  function esc(s) {
+    var d = document.createElement("div");
+    d.textContent = s == null ? "" : String(s);
+    return d.innerHTML;
+  }
+
   /* ── Quick-access: logos dos ícones de ferramenta ──────────────────── */
   function initQuickAccess() {
     var btns = document.querySelectorAll(".quick-access-btn");
@@ -267,11 +273,126 @@
       .catch(function () { renderCarousel([]); });
   }
 
+  function renderLumeResult(data) {
+    var result = document.getElementById("lume-result");
+    var status = document.getElementById("lume-result-status");
+    var answer = document.getElementById("lume-answer");
+    var suggestions = document.getElementById("lume-suggestions");
+    if (!result || !status || !answer || !suggestions) return;
+
+    result.hidden = false;
+    status.textContent = data.low_confidence
+      ? "A Lume encontrou pouca correspondência. Use como orientação inicial."
+      : "Resposta da Lume";
+    status.classList.toggle("is-low-confidence", !!data.low_confidence);
+    answer.innerHTML = esc(data.answer || "").replace(/\n/g, "<br>");
+    suggestions.innerHTML = "";
+
+    var pills = Array.isArray(data.suggested_pills) ? data.suggested_pills : [];
+    var questions = Array.isArray(data.suggested_questions) ? data.suggested_questions : [];
+    if (!pills.length && !questions.length) {
+      suggestions.hidden = true;
+      return;
+    }
+
+    suggestions.hidden = false;
+    if (pills.length) {
+      var title = document.createElement("h3");
+      title.className = "lume-result__subtitle";
+      title.textContent = "Pílulas sugeridas";
+      suggestions.appendChild(title);
+      var list = document.createElement("ul");
+      list.className = "lume-result__cards";
+      pills.slice(0, 4).forEach(function (pill) {
+        list.appendChild(buildCard(pill));
+      });
+      suggestions.appendChild(list);
+    }
+
+    if (questions.length) {
+      var qTitle = document.createElement("h3");
+      qTitle.className = "lume-result__subtitle";
+      qTitle.textContent = "Tente perguntar";
+      suggestions.appendChild(qTitle);
+      var qWrap = document.createElement("div");
+      qWrap.className = "lume-result__chips";
+      questions.slice(0, 5).forEach(function (question) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "domain-objective-chip";
+        btn.textContent = question;
+        btn.addEventListener("click", function () {
+          var input = document.getElementById("lume-search-input");
+          if (input) {
+            input.value = question;
+            input.focus();
+          }
+        });
+        qWrap.appendChild(btn);
+      });
+      suggestions.appendChild(qWrap);
+    }
+  }
+
+  function bindLumeSearch() {
+    var form = document.getElementById("lume-search-form");
+    var input = document.getElementById("lume-search-input");
+    var result = document.getElementById("lume-result");
+    var status = document.getElementById("lume-result-status");
+    var answer = document.getElementById("lume-answer");
+    if (!form || !input || !result || !status || !answer) return;
+
+    form.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var c = cfg();
+      var query = input.value.trim();
+      if (!query) {
+        result.hidden = false;
+        status.textContent = "Descreva sua dúvida para a Lume orientar melhor.";
+        answer.textContent = "";
+        return;
+      }
+      if (!c.apiBase) {
+        result.hidden = false;
+        status.textContent = "Configure js/hp-config.js com apiBase.";
+        answer.textContent = "";
+        return;
+      }
+
+      result.hidden = false;
+      status.textContent = "Consultando a Lume...";
+      answer.textContent = "";
+      var suggestions = document.getElementById("lume-suggestions");
+      if (suggestions) {
+        suggestions.innerHTML = "";
+        suggestions.hidden = true;
+      }
+
+      fetch(c.apiBase + "/lume/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ query: query, "scenario": "home" }),
+      })
+        .then(function (r) {
+          return r.json().then(function (data) {
+            if (!r.ok) throw new Error((data && data.detail) || "Erro " + r.status);
+            return data;
+          });
+        })
+        .then(renderLumeResult)
+        .catch(function (err) {
+          status.textContent = "Não consegui consultar a Lume agora.";
+          answer.textContent = err && err.message ? err.message : "Tente novamente em instantes.";
+        });
+    });
+  }
+
   /* ── Bootstrap ───────────────────────────────────────────────────── */
   function boot() {
     var c = cfg();
     initQuickAccess();
     wireDomainFilters();
+    bindLumeSearch();
     if (c && c.apiBase) {
       fetchTrending(c.apiBase);
       fetchDomainCategories(c.apiBase);

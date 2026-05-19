@@ -11,6 +11,7 @@
 
   /** Alinha com o backend: iframe usa só /pubembed (converte legado /pub). */
   var SLIDES_RE = /^https:\/\/docs\.google\.com\/presentation\/d\/e\/[^/\s#?]+\/pubembed(\?[^\s#]*)?$/i;
+  var currentPillId = null;
 
   function coerceSlidesEmbedUrl(raw) {
     var s = String(raw || "").trim();
@@ -221,6 +222,64 @@
     fetch(apiBase + "/pills/" + encodeURIComponent(id) + "/view", { method: "POST" }).catch(function () {});
   }
 
+  function renderPillLumeResult(data) {
+    var result = qs("pill-lume-result");
+    var status = qs("pill-lume-status");
+    var answer = qs("pill-lume-answer");
+    if (!result || !status || !answer) return;
+    result.hidden = false;
+    status.textContent = data.low_confidence ? "Resposta com baixa confiança" : "Resposta da Lume";
+    status.classList.toggle("is-low-confidence", !!data.low_confidence);
+    answer.innerHTML = esc(data.answer || "").replace(/\n/g, "<br>");
+  }
+
+  function bindPillLume(cfg) {
+    var form = qs("pill-lume-form");
+    var input = qs("pill-lume-input");
+    var result = qs("pill-lume-result");
+    var status = qs("pill-lume-status");
+    var answer = qs("pill-lume-answer");
+    if (!form || !input || !result || !status || !answer) return;
+
+    form.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var query = input.value.trim();
+      if (!query) {
+        result.hidden = false;
+        status.textContent = "Digite sua dúvida sobre esta pílula.";
+        answer.textContent = "";
+        return;
+      }
+      if (!currentPillId) {
+        result.hidden = false;
+        status.textContent = "Aguarde a pílula terminar de carregar.";
+        answer.textContent = "";
+        return;
+      }
+
+      result.hidden = false;
+      status.textContent = "Consultando a Lume...";
+      answer.textContent = "";
+
+      fetch(cfg.apiBase + "/lume/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ query: query, "scenario": "pill", pill_id: currentPillId }),
+      })
+        .then(function (r) {
+          return r.json().then(function (data) {
+            if (!r.ok) throw new Error((data && data.detail) || "Erro " + r.status);
+            return data;
+          });
+        })
+        .then(renderPillLumeResult)
+        .catch(function (err) {
+          status.textContent = "Não consegui consultar a Lume agora.";
+          answer.textContent = err && err.message ? err.message : "Tente novamente em instantes.";
+        });
+    });
+  }
+
   /* ── Cards do carrossel «Relacionadas» ───────────────────────────────── */
   function buildRelatedCard(pill) {
     var brand = typeof window.resolveToolBrand === "function"
@@ -342,6 +401,7 @@
         return r.json();
       })
       .then(function (pill) {
+        currentPillId = pill.id;
         document.title = "HelpProf — " + pill.title;
         var h = qs("dual-guide-title");
         if (h) h.textContent = pill.title;
@@ -361,6 +421,7 @@
   function boot() {
     var cfg = window.HP_CONFIG;
     if (!cfg || !cfg.apiBase) { showError("Configure <code>js/hp-config.js</code>."); return; }
+    bindPillLume(cfg);
 
     var id       = param("id");
     var category = (param("category") || "").trim().toUpperCase();

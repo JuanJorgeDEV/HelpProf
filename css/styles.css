@@ -1249,6 +1249,88 @@ body {
   line-height: 1.45;
 }
 
+.lume-result {
+  margin: 1rem auto 0;
+  max-width: 720px;
+  padding: 1rem;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.lume-result--pill {
+  width: min(100%, 680px);
+  margin-top: 0.75rem;
+}
+
+.lume-result__status {
+  margin: 0 0 0.55rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-primary-purple);
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.lume-result__status.is-low-confidence {
+  color: #b45309;
+}
+
+.lume-result__answer {
+  color: var(--text-main);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.lume-result__subtitle {
+  margin: 1rem 0 0.5rem;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.lume-result__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.lume-result__cards .pill-carousel__slide {
+  width: auto;
+  min-width: 0;
+}
+
+.lume-result__cards .pill-card {
+  min-height: 100%;
+}
+
+.lume-result__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lume-search--pill {
+  width: min(100%, 680px);
+  max-width: none;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .lume-search {
+    flex-direction: column;
+  }
+
+  .lume-search__submit {
+    width: 100%;
+  }
+}
+
 /* Rodapé — duas linhas */
 .site-footer--split {
   padding: 1.5rem 0 2rem;

@@ -99,6 +99,21 @@
                   tabindex="0"
                 />
               </div>
+              <form id="pill-lume-form" class="lume-search lume-search--pill" action="#" method="post">
+                <label class="visually-hidden" for="pill-lume-input">Pergunte sobre esta pílula</label>
+                <input
+                  id="pill-lume-input"
+                  class="lume-search__input"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Pergunte sobre esta pílula..."
+                />
+                <button type="submit" class="lume-search__submit">Perguntar</button>
+              </form>
+              <article id="pill-lume-result" class="lume-result lume-result--pill" aria-live="polite" hidden>
+                <p id="pill-lume-status" class="lume-result__status"></p>
+                <div id="pill-lume-answer" class="lume-result__answer"></div>
+              </article>
             </div>
           </div>
 

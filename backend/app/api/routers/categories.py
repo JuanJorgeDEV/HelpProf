@@ -136,18 +136,6 @@ def delete_category(category_id: UUID) -> dict[str, str]:
     """Hard delete — só permitido se nenhuma pílula/guia referencia esta categoria."""
     client = get_service_client()
 
-    # Verificar uso antes de remover
-    pills_res = supabase_call(
-        "categories_check_pills",
-        lambda: client.table("pills")
-        .select("id")
-        .eq("tool_category", str(category_id))
-        .limit(1)
-        .execute(),
-    )
-    if pills_res.data:
-        raise HelpProfError("Categoria em uso por pílulas — remova ou reclassifique antes de apagar.")
-
     cat_res = supabase_call(
         "categories_get_for_delete",
         lambda: client.table("categories")
@@ -158,6 +146,30 @@ def delete_category(category_id: UUID) -> dict[str, str]:
     )
     if not getattr(cat_res, "data", None):
         raise NotFoundError("Categoria não encontrada.")
+    slug = str(cat_res.data.get("slug") or "").strip().upper()
+
+    pills_res = supabase_call(
+        "categories_check_pills",
+        lambda: client.table("pills")
+        .select("id")
+        .eq("tool_category", slug)
+        .limit(1)
+        .execute(),
+    )
+    if pills_res.data:
+        raise HelpProfError("Categoria em uso por pílulas — remova ou reclassifique antes de apagar.")
+
+    guides_res = supabase_call(
+        "categories_check_domain_guides",
+        lambda: client.table("domain_guides")
+        .select("id")
+        .eq("tool_category", slug)
+        .is_("deleted_at", "null")
+        .limit(1)
+        .execute(),
+    )
+    if guides_res.data:
+        raise HelpProfError("Categoria em uso por guia de domínio — remova ou reclassifique antes de apagar.")
 
     supabase_call(
         "categories_delete",

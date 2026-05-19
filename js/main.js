@@ -77,16 +77,6 @@
   initReveal();
 
   /* ==========================================================================
-   * Formulário da Lume (index) — evita envio em página estática
-   * ========================================================================== */
-  var lumeSearchForm = document.getElementById("lume-search-form");
-  if (lumeSearchForm) {
-    lumeSearchForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-    });
-  }
-
-  /* ==========================================================================
    * Dual Guide — abas (página pilulaOneDrive)
    * ========================================================================== */
   var tabButtons = document.querySelectorAll(".tab-switcher__btn[data-tab]");
