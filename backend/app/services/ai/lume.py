@@ -44,7 +44,7 @@ def _llm() -> GoogleGenAI:
     settings = get_settings()
     if not settings.gemini_api_key:
         raise ServiceUnavailableError("GEMINI_API_KEY não configurada.")
-    return GoogleGenAI(model="gemini-1.5-flash", api_key=settings.gemini_api_key, temperature=0.2)
+    return GoogleGenAI(model="gemini-2.5-flash", api_key=settings.gemini_api_key, temperature=0.2)
 
 
 def _fetch_pill_row(pill_id: UUID) -> dict:

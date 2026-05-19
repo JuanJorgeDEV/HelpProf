@@ -41,7 +41,7 @@ def question_within_scope(question: str) -> bool:
     t0 = time.perf_counter()
     try:
         resp = client.models.generate_content(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             contents=_GUARDRAIL_INSTRUCTION + question.strip(),
             config=types.GenerateContentConfig(temperature=0.0),
         )

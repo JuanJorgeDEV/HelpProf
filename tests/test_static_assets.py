@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SEED = ROOT / "supabase" / "migrations" / "20260518160000_seed_help_prof_docx_content.sql"
+DOMAIN_GUIDE_SEED = ROOT / "supabase" / "migrations" / "20260519100000_seed_domain_guides_markdown.sql"
 
 
 class StaticAssetTests(unittest.TestCase):
@@ -47,6 +48,32 @@ class StaticAssetTests(unittest.TestCase):
         self.assertIn('"/lume/query"', pill_js)
         self.assertIn('"scenario": "pill"', pill_js)
         self.assertIn("currentPillId", pill_js)
+
+    def test_domain_guide_seed_migration_contains_14_markdown_guides(self):
+        sql = DOMAIN_GUIDE_SEED.read_text(encoding="utf-8")
+
+        for slug in (
+            "WORD",
+            "GOOGLE_DRIVE",
+            "EXCEL",
+            "CANVA",
+            "GOOGLE_FORMS",
+            "GOOGLE_CLASSROOM",
+            "KAHOOT",
+            "POWERPOINT",
+            "GOOGLE_MEET",
+            "ONEDRIVE",
+            "CMSP",
+            "SED",
+            "TEAMS",
+            "NOVA_ESCOLA",
+        ):
+            self.assertIn(f"'{slug}'", sql)
+
+        self.assertEqual(len(re.findall(r"\('GUIDE-[0-9]{2}'", sql)), 14)
+        self.assertIn("INSERT INTO public.domain_guides", sql)
+        self.assertIn("ON CONFLICT (tool_category) WHERE deleted_at IS NULL DO UPDATE", sql)
+        self.assertIn("deep_content = EXCLUDED.deep_content", sql)
 
 
 if __name__ == "__main__":
