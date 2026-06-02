@@ -51,6 +51,7 @@
       <button class="adm-tab is-active" role="tab" aria-selected="true"  data-tab="pills"     >Pílulas</button>
       <button class="adm-tab"            role="tab" aria-selected="false" data-tab="categories">Ferramentas</button>
       <button class="adm-tab"            role="tab" aria-selected="false" data-tab="guides"    >Guias de Domínio</button>
+      <button class="adm-tab"            role="tab" aria-selected="false" data-tab="lume-ai"   >IA / Lume</button>
     </nav>
 
     <!-- ======================== ABA PÍLULAS ======================== -->
@@ -202,6 +203,29 @@
         </div>
       </div>
     </div>
+    <!-- ======================== ABA IA / LUME ======================== -->
+    <div class="adm-pane" id="pane-lume-ai">
+
+      <div class="adm-card">
+        <h2 style="margin-top:0">Impressões digitais das pílulas (Embeddings)</h2>
+        <p class="adm-note" style="font-size:.9rem;line-height:1.6;margin-bottom:1rem">
+          Para a Lume funcionar bem na <strong>página inicial</strong>, cada pílula precisa de uma
+          "impressão digital" gerada pelo Google. Pílulas criadas pelo admin já ganham isso
+          automaticamente. As pílulas importadas via migration precisam ser processadas uma vez.
+        </p>
+        <div class="adm-row" style="align-items:center;flex-wrap:wrap;gap:.75rem">
+          <button type="button" class="btn-primary" id="btn-backfill-embeddings">
+            Gerar impressões digitais em falta
+          </button>
+          <span class="adm-note" id="backfill-hint" style="font-size:.85rem">
+            Só processa pílulas que ainda não têm. Pode demorar ~30–60 s.
+          </span>
+        </div>
+        <div id="backfill-result" class="adm-backfill-result" hidden></div>
+      </div>
+
+    </div>
+
   </section>
 </main>
 

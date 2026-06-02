@@ -72,6 +72,10 @@
     btnGuideReset: $("btn-guide-reset"),
     guidesTbody: $("guides-tbody"),
     btnRefreshGuides: $("btn-refresh-guides"),
+    // lume / ai tab
+    btnBackfill: $("btn-backfill-embeddings"),
+    backfillResult: $("backfill-result"),
+    backfillHint: $("backfill-hint"),
   };
 
   // ── utilidades ───────────────────────────────────────────────────────────
@@ -745,6 +749,44 @@
   if (ui.btnRefreshGuides) {
     ui.btnRefreshGuides.addEventListener("click", function () {
       refreshGuides().catch(function (e) { setStatus(e.message, true); });
+    });
+  }
+
+  // ── IA / Lume — backfill embeddings ──────────────────────────────────────
+  if (ui.btnBackfill) {
+    ui.btnBackfill.addEventListener("click", async function () {
+      ui.btnBackfill.disabled = true;
+      ui.btnBackfill.textContent = "Gerando… aguarde";
+      if (ui.backfillHint) ui.backfillHint.textContent = "Isso pode demorar 30–60 s dependendo da quantidade de pílulas.";
+      if (ui.backfillResult) ui.backfillResult.hidden = true;
+
+      try {
+        var data = await apiFetch("/admin/embeddings/backfill", { method: "POST" });
+        if (ui.backfillResult) {
+          var hadErrors = data.erros > 0;
+          ui.backfillResult.innerHTML =
+            "<strong>Resultado:</strong><br>" +
+            "Pílulas sem impressão digital encontradas: <b>" + data.total_sem_embedding + "</b><br>" +
+            "Geradas com sucesso: <b>" + data.gerados + "</b><br>" +
+            (hadErrors
+              ? "Com erro: <b style='color:var(--adm-danger)'>" + data.erros + "</b><br>" +
+                "<details style='margin-top:.5rem'><summary>Ver erros</summary><pre style='font-size:.75rem;overflow:auto'>" +
+                esc(JSON.stringify(data.detalhes_erros, null, 2)) + "</pre></details>"
+              : "Erros: <b>0</b> 🎉") +
+            (data.total_sem_embedding === 0
+              ? "<br><em>Todas as pílulas já tinham impressão digital.</em>"
+              : "");
+          ui.backfillResult.className = "adm-backfill-result adm-backfill-result--" + (hadErrors ? "warn" : "ok");
+          ui.backfillResult.hidden = false;
+        }
+        if (ui.backfillHint) ui.backfillHint.textContent = "Concluído. Novas pílulas ganham impressão digital automaticamente.";
+      } catch (e) {
+        setStatus("Erro ao gerar embeddings: " + (e.message || e), true);
+        if (ui.backfillHint) ui.backfillHint.textContent = "Falhou. Tente novamente ou verifique o status da API.";
+      } finally {
+        ui.btnBackfill.disabled = false;
+        ui.btnBackfill.textContent = "Gerar impressões digitais em falta";
+      }
     });
   }
 

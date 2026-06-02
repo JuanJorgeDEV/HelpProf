@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
@@ -17,6 +18,8 @@ from app.models.schemas import (
     PillUpdateIn,
 )
 from app.services.db.supabase_client import get_service_client, supabase_call
+
+log = logging.getLogger("helpprof.admin")
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -227,6 +230,47 @@ def update_domain_guide(guide_id: UUID, body: DomainGuideUpdateIn) -> DomainGuid
         raise NotFoundError("Guia não encontrado.")
     r = rows[0]
     return _domain_guide_from_row(r)
+
+
+@router.post("/embeddings/backfill", dependencies=[_auth])
+def backfill_embeddings() -> dict:
+    """
+    Gera as 'impressões digitais' (embeddings) de todas as pílulas que ainda não as têm.
+    Precisa ser executado uma vez para que a busca da Lume na Home funcione corretamente.
+    Cada pílula consome ~1 chamada à API do Google; pode demorar alguns segundos.
+    """
+    from app.services.ai.lume import apply_pill_embedding
+
+    client = get_service_client()
+    res = supabase_call(
+        "admin_pills_without_embedding",
+        lambda: client.table("pills")
+        .select("id,title")
+        .is_("embedding", "null")
+        .is_("deleted_at", "null")
+        .execute(),
+    )
+    rows = res.data or []
+    total = len(rows)
+    done = 0
+    errors: list[dict] = []
+
+    for row in rows:
+        pid = UUID(row["id"])
+        try:
+            apply_pill_embedding(pid)
+            done += 1
+            log.info("Embedding gerado: %s — %s", row["id"], row["title"])
+        except Exception as exc:
+            log.warning("Falha ao gerar embedding para %s: %s", row["id"], exc)
+            errors.append({"pill_id": row["id"], "title": row["title"], "error": str(exc)})
+
+    return {
+        "total_sem_embedding": total,
+        "gerados": done,
+        "erros": len(errors),
+        "detalhes_erros": errors,
+    }
 
 
 @router.put("/domain-guides/by-category/{tool_category}", response_model=DomainGuidePublicOut, dependencies=[_auth])

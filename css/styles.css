@@ -2,6 +2,7 @@
 
 :root {
   --adm-accent: #6366f1;
+  --adm-danger: #dc2626;
   --bg-gradient-start: #f8fafc;
   --bg-gradient-end: #eef2ff;
   --color-primary-purple: #8b5cf6;
@@ -1986,6 +1987,28 @@ body {
   font-size: 0.82rem;
   color: var(--text-muted);
   margin-top: 0.25rem;
+}
+
+/* ── IA / Lume — backfill result ── */
+.adm-backfill-result {
+  margin-top: 1rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  border: 1px solid transparent;
+}
+
+.adm-backfill-result--ok {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #065f46;
+}
+
+.adm-backfill-result--warn {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #78350f;
 }
 
 .adm-row {
