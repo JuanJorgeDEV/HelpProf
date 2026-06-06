@@ -46,8 +46,9 @@ def question_within_scope(question: str) -> bool:
             config=types.GenerateContentConfig(temperature=0.0),
         )
     except Exception as exc:
-        log.exception("Falha no guardrail Gemini: %s", exc)
-        raise ServiceUnavailableError("Triagem de escopo indisponível no momento.") from exc
+        # Falha aberta: não bloqueia o professor por instabilidade transitória do Gemini.
+        log.warning("Guardrail indisponível (%s); liberando pergunta.", exc)
+        return True
 
     ms = (time.perf_counter() - t0) * 1000
     log.debug("Guardrail Gemini em %.1f ms", ms)

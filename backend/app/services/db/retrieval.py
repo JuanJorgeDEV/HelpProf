@@ -29,7 +29,7 @@ def hybrid_pill_search(query: str) -> tuple[list[dict[str, Any]], float | None]:
     """
     settings = get_settings()
     client = get_service_client()
-    vec = embed_text_768(query.strip())
+    vec = embed_text_768(query.strip(), task_type="RETRIEVAL_QUERY")
     best_sim: float | None = None
 
     sem_rows: list[dict[str, Any]] = supabase_call(

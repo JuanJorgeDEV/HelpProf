@@ -268,7 +268,12 @@
       })
         .then(function (r) {
           return r.json().then(function (data) {
-            if (!r.ok) throw new Error((data && data.detail) || "Erro " + r.status);
+            if (!r.ok) {
+              var msg = (data && data.error && (data.error.message || data.error.detail))
+                || (data && data.detail)
+                || ("Erro " + r.status);
+              throw new Error(msg);
+            }
             return data;
           });
         })

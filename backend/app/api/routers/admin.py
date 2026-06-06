@@ -240,6 +240,7 @@ def backfill_embeddings() -> dict:
     Cada pílula consome ~1 chamada à API do Google; pode demorar alguns segundos.
     """
     from app.services.ai.lume import apply_pill_embedding
+    import time as _time
 
     client = get_service_client()
     res = supabase_call(
@@ -261,6 +262,7 @@ def backfill_embeddings() -> dict:
             apply_pill_embedding(pid)
             done += 1
             log.info("Embedding gerado: %s — %s", row["id"], row["title"])
+            _time.sleep(0.4)
         except Exception as exc:
             log.warning("Falha ao gerar embedding para %s: %s", row["id"], exc)
             errors.append({"pill_id": row["id"], "title": row["title"], "error": str(exc)})
