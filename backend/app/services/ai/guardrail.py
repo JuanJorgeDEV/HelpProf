@@ -1,75 +1,70 @@
+"""
+Guardrail rápido por palavras-chave — sem chamada LLM.
+
+Bloqueia apenas tópicos claramente fora do universo escolar/tecnológico.
+O padrão é LIBERAR: professores merecem o benefício da dúvida.
+Remove ~2-4 s de latência por query eliminando a segunda chamada ao Gemini.
+"""
 from __future__ import annotations
 
-import json
-import logging
 import re
-import time
-
-from google import genai
-from google.genai import types
-
-from app.config import get_settings
-from app.core.errors import ServiceUnavailableError
-
-log = logging.getLogger("helpprof.gemini.guardrail")
 
 OUT_OF_SCOPE_REPLY_PT = (
     "Professor, sou a Lume, assistente técnica do HelpProf. "
-    "Só consigo ajudar com ferramentas escolares como OneDrive, Excel, etc. "
-    "Como posso auxiliar nessas ferramentas?"
+    "Só consigo ajudar com ferramentas e tecnologia escolar (Word, Excel, OneDrive, "
+    "SED, CMSP, Canva, WhatsApp e outras). Como posso ajudar?"
 )
 
-_GUARDRAIL_INSTRUCTION = """Você é um classificador de escopo para suporte tecnológico a professores da rede pública.
+# Pares (nome_legível, padrão_regex).
+# Matching é case-insensitive. Delimitadores \b evitam falsos positivos.
+_BLOCK_RULES: list[tuple[str, str]] = [
+    (
+        "culinária",
+        r"\b(receita(s)?\s+de|culin[áa]ri[ao]|gastronomia|ingrediente(s)?\s+para|como\s+cozinhar|tempero)\b",
+    ),
+    (
+        "esportes",
+        r"\b(futebol|basquete|v[oô]lei|t[êe]nis\s+de\s+campo|natação|campeonato\s+brasileiro|gol\s+do|pelada)\b",
+    ),
+    (
+        "política-partidária",
+        r"\b(elei[çc][aã]o\s+(para|de)|partido\s+pol[íi]tico|deputado\s+federal|senador\s+(da|de)|presidente\s+da\s+rep[uú]blica)\b",
+    ),
+    (
+        "apostas",
+        r"\b(apostas?\s+esportiva(s)?|bet365|betano|loteria\s+federal|jogo\s+do\s+bicho)\b",
+    ),
+    (
+        "entretenimento-puro",
+        r"\b(netflix|prime\s+video|disney\s*\+|hbo\s+max|filmografia\s+de|série\s+policial)\b",
+    ),
+]
 
-Decida se a pergunta tem relação com: ferramentas digitais (Office, Google Workspace, OneDrive, SED, Moodle, reprodução de vídeo em sala, projetor, impressora escolar), educação em ambiente escolar ou suporte a uso de tecnologia na escola.
-
-Responda SOMENTE um JSON válido no formato exato:
-{"dentro_escopo": true}
-ou
-{"dentro_escopo": false}
-
-Pergunta do professor:
-"""
+# Termos que salvam a pergunta de ser bloqueada mesmo que contenha palavra suspeita.
+_SCHOOL_RESCUE: list[str] = [
+    r"\b(escola|aluno|turma|aula|professor|sala\s+de\s+aula|rede\s+p[uú]blica|pedagog)\b",
+    r"\b(sed|cmsp|onedrive|word|excel|canva|kahoot|teams|classroom|google)\b",
+]
 
 
 def question_within_scope(question: str) -> bool:
-    settings = get_settings()
-    if not settings.gemini_api_key:
-        raise ServiceUnavailableError("GEMINI_API_KEY não configurada.")
-
-    client = genai.Client(api_key=settings.gemini_api_key)
-    t0 = time.perf_counter()
-    try:
-        resp = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=_GUARDRAIL_INSTRUCTION + question.strip(),
-            config=types.GenerateContentConfig(temperature=0.0),
-        )
-    except Exception as exc:
-        # Falha aberta: não bloqueia o professor por instabilidade transitória do Gemini.
-        log.warning("Guardrail indisponível (%s); liberando pergunta.", exc)
+    """
+    Retorna False somente quando a pergunta claramente não tem relação com
+    tecnologia escolar. Qualquer dúvida sobre o universo educacional passa.
+    """
+    q = question.strip()
+    if not q:
         return True
 
-    ms = (time.perf_counter() - t0) * 1000
-    log.debug("Guardrail Gemini em %.1f ms", ms)
+    q_lower = q.lower()
 
-    text = (getattr(resp, "text", None) or "").strip()
-    if not text:
-        return True  # falha segura para não bloquear suporte legítimo em caso de timeout vazio
+    # Se há indício escolar explícito, não bloqueia independente do resto.
+    for rescue in _SCHOOL_RESCUE:
+        if re.search(rescue, q_lower, re.IGNORECASE):
+            return True
 
-    try:
-        data = json.loads(text)
-        return bool(data.get("dentro_escopo"))
-    except json.JSONDecodeError:
-        m = re.search(r"\{[^}]*dentro_escopo[^}]*\}", text, re.I)
-        if m:
-            try:
-                data = json.loads(m.group(0))
-                return bool(data.get("dentro_escopo"))
-            except json.JSONDecodeError:
-                pass
+    for _name, pattern in _BLOCK_RULES:
+        if re.search(pattern, q_lower, re.IGNORECASE):
+            return False
 
-    low = text.lower()
-    if "false" in low and "dentro_escopo" in low.replace(" ", ""):
-        return False
     return True

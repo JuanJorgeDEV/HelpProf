@@ -230,7 +230,7 @@
     result.hidden = false;
     status.textContent = data.low_confidence ? "Resposta com baixa confiança" : "Resposta da Lume";
     status.classList.toggle("is-low-confidence", !!data.low_confidence);
-    answer.innerHTML = esc(data.answer || "").replace(/\n/g, "<br>");
+    answer.innerHTML = renderMarkdown(data.answer || "");
   }
 
   function bindPillLume(cfg) {

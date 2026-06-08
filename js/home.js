@@ -1,6 +1,12 @@
 /**
- * home.js — carrega trending pills e quick-access dinâmico
+ * home.js — carrega trending pills, guias de domínio, quick-access e busca Lume.
  * Requer js/hp-config.js e js/tool-assets.js antes deste script.
+ *
+ * Melhorias:
+ *  - Markdown renderizado via marked.js (CDN)
+ *  - Streaming SSE via /lume/stream
+ *  - Memória de conversa via sessionStorage (últimas 3 trocas)
+ *  - Loading skeleton animado durante busca
  */
 (function () {
   "use strict";
@@ -8,6 +14,31 @@
   var domainCategories = [];
   var activeDomainGroup = "";
 
+  // ── Histórico de conversa ──────────────────────────────────
+  var _HISTORY_KEY = "lume_history";
+  var _MAX_HISTORY = 6; // máx 3 pares user/assistant
+
+  function getHistory() {
+    try {
+      return JSON.parse(sessionStorage.getItem(_HISTORY_KEY) || "[]");
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveHistory(history) {
+    try {
+      sessionStorage.setItem(_HISTORY_KEY, JSON.stringify(history.slice(-_MAX_HISTORY)));
+    } catch (e) { /* sessionStorage indisponível */ }
+  }
+
+  function addToHistory(role, content) {
+    var h = getHistory();
+    h.push({ role: role, content: String(content || "").slice(0, 1000) });
+    saveHistory(h);
+  }
+
+  // ── Helpers ────────────────────────────────────────────────
   function cfg() { return window.HP_CONFIG || {}; }
 
   function esc(s) {
@@ -16,15 +47,47 @@
     return d.innerHTML;
   }
 
+  function renderMarkdown(md) {
+    if (typeof window.marked !== "undefined") {
+      return window.marked.parse(String(md || ""), { breaks: true, gfm: true });
+    }
+    // Fallback simples se marked ainda não carregou
+    return esc(md).replace(/\n/g, "<br>");
+  }
+
+  // ── Loading skeleton ───────────────────────────────────────
+  function showLumeLoading(statusEl, answerEl) {
+    if (statusEl) {
+      statusEl.innerHTML =
+        '<span class="lume-thinking" aria-label="Consultando a Lume">' +
+        '<span class="lume-thinking__dot"></span>' +
+        '<span class="lume-thinking__dot"></span>' +
+        '<span class="lume-thinking__dot"></span>' +
+        '</span>';
+    }
+    if (answerEl) {
+      answerEl.innerHTML =
+        '<div class="lume-skeleton-line" style="width:88%"></div>' +
+        '<div class="lume-skeleton-line" style="width:72%"></div>' +
+        '<div class="lume-skeleton-line" style="width:82%"></div>' +
+        '<div class="lume-skeleton-line" style="width:55%"></div>';
+    }
+  }
+
   /* ── Quick-access: logos dos ícones de ferramenta ──────────────────── */
   function initQuickAccess() {
     var btns = document.querySelectorAll(".quick-access-btn");
     if (!btns.length) return;
     btns.forEach(function (btn) {
-      var label = btn.querySelector(".quick-access-btn__label");
-      if (!label) return;
-      var slug = label.textContent.trim().toUpperCase();
-      if (typeof window.resolveToolBrand !== "function") return;
+      // Lê o slug do parâmetro ?categoria= do href (mais confiável que o texto do label)
+      var href = btn.getAttribute("href") || "";
+      var match = href.match(/[?&]categoria=([^&]+)/i);
+      var slug = match ? decodeURIComponent(match[1]).toUpperCase() : "";
+      if (!slug) {
+        var label = btn.querySelector(".quick-access-btn__label");
+        if (label) slug = label.textContent.trim().toUpperCase();
+      }
+      if (!slug || typeof window.resolveToolBrand !== "function") return;
       var brand = window.resolveToolBrand(slug);
       if (!brand.logo || brand.logo === "Logo.jpeg") return;
       var glyph = btn.querySelector(".quick-access-btn__glyph");
@@ -55,7 +118,6 @@
     a.title = pill.title;
     if (brand.color) a.style.setProperty("--pill-card-accent", brand.color);
 
-    /* ícone / logo */
     var iconDiv = document.createElement("div");
     iconDiv.className = "pill-card__icon";
     iconDiv.setAttribute("aria-hidden", "true");
@@ -68,7 +130,6 @@
       img.style.cssText = "width:32px;height:32px;object-fit:contain;border-radius:6px";
       iconDiv.appendChild(img);
     } else {
-      /* SVG genérico */
       iconDiv.className += " pill-card__icon--doc";
       iconDiv.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M14 2v6h6M8 13h8M8 17h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
     }
@@ -159,16 +220,16 @@
     group.className = "home-domain-card__group";
     group.textContent = cat.group_tag || "Manual";
 
-    var title = document.createElement("h3");
-    title.className = "home-domain-card__name";
-    title.textContent = brand.label;
+    var titleEl = document.createElement("h3");
+    titleEl.className = "home-domain-card__name";
+    titleEl.textContent = brand.label;
 
     var desc = document.createElement("p");
     desc.className = "home-domain-card__desc";
     desc.textContent = domainDescription(cat);
 
     body.appendChild(group);
-    body.appendChild(title);
+    body.appendChild(titleEl);
     body.appendChild(desc);
     a.appendChild(logoWrap);
     a.appendChild(body);
@@ -273,47 +334,49 @@
       .catch(function () { renderCarousel([]); });
   }
 
-  function renderLumeResult(data) {
+  /* ── Render resultado Lume ────────────────────────────────── */
+  function renderLumeResult(data, statusEl, answerEl, suggestionsEl) {
     var result = document.getElementById("lume-result");
-    var status = document.getElementById("lume-result-status");
-    var answer = document.getElementById("lume-answer");
-    var suggestions = document.getElementById("lume-suggestions");
-    if (!result || !status || !answer || !suggestions) return;
+    if (!statusEl || !answerEl) return;
 
-    result.hidden = false;
-    status.textContent = data.low_confidence
+    if (result) result.hidden = false;
+    statusEl.textContent = data.low_confidence
       ? "A Lume encontrou pouca correspondência. Use como orientação inicial."
       : "Resposta da Lume";
-    status.classList.toggle("is-low-confidence", !!data.low_confidence);
-    answer.innerHTML = esc(data.answer || "").replace(/\n/g, "<br>");
-    suggestions.innerHTML = "";
+    statusEl.classList.toggle("is-low-confidence", !!data.low_confidence);
+
+    // Renderiza markdown
+    answerEl.innerHTML = renderMarkdown(data.answer || "");
+
+    if (!suggestionsEl) return;
+    suggestionsEl.innerHTML = "";
 
     var pills = Array.isArray(data.suggested_pills) ? data.suggested_pills : [];
     var questions = Array.isArray(data.suggested_questions) ? data.suggested_questions : [];
     if (!pills.length && !questions.length) {
-      suggestions.hidden = true;
+      suggestionsEl.hidden = true;
       return;
     }
 
-    suggestions.hidden = false;
+    suggestionsEl.hidden = false;
     if (pills.length) {
       var title = document.createElement("h3");
       title.className = "lume-result__subtitle";
       title.textContent = "Pílulas sugeridas";
-      suggestions.appendChild(title);
+      suggestionsEl.appendChild(title);
       var list = document.createElement("ul");
       list.className = "lume-result__cards";
       pills.slice(0, 4).forEach(function (pill) {
         list.appendChild(buildCard(pill));
       });
-      suggestions.appendChild(list);
+      suggestionsEl.appendChild(list);
     }
 
     if (questions.length) {
       var qTitle = document.createElement("h3");
       qTitle.className = "lume-result__subtitle";
       qTitle.textContent = "Tente perguntar";
-      suggestions.appendChild(qTitle);
+      suggestionsEl.appendChild(qTitle);
       var qWrap = document.createElement("div");
       qWrap.className = "lume-result__chips";
       questions.slice(0, 5).forEach(function (question) {
@@ -330,74 +393,148 @@
         });
         qWrap.appendChild(btn);
       });
-      suggestions.appendChild(qWrap);
+      suggestionsEl.appendChild(qWrap);
     }
   }
 
+  /* ── Busca Lume com streaming SSE ─────────────────────────── */
   function bindLumeSearch() {
     var form = document.getElementById("lume-search-form");
     var input = document.getElementById("lume-search-input");
     var result = document.getElementById("lume-result");
-    var status = document.getElementById("lume-result-status");
-    var answer = document.getElementById("lume-answer");
-    if (!form || !input || !result || !status || !answer) return;
+    var statusEl = document.getElementById("lume-result-status");
+    var answerEl = document.getElementById("lume-answer");
+    var suggestionsEl = document.getElementById("lume-suggestions");
+    var mascot = document.getElementById("lume-mascot");
+
+    if (!form || !input || !result || !statusEl || !answerEl) return;
+
+    function setMascotUp(up) {
+      if (!mascot) return;
+      var src = up ? mascot.dataset.srcUp : mascot.dataset.srcDown;
+      if (src) mascot.src = src;
+    }
 
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
       var c = cfg();
       var query = input.value.trim();
+
       if (!query) {
         result.hidden = false;
-        status.textContent = "Descreva sua dúvida para a Lume orientar melhor.";
-        answer.textContent = "";
+        statusEl.textContent = "Descreva sua dúvida para a Lume orientar melhor.";
+        answerEl.textContent = "";
         return;
       }
       if (!c.apiBase) {
         result.hidden = false;
-        status.textContent = "Configure js/hp-config.js com apiBase.";
-        answer.textContent = "";
+        statusEl.textContent = "Configure js/hp-config.js com apiBase.";
+        answerEl.textContent = "";
         return;
       }
 
+      // Mostra skeleton de loading
       result.hidden = false;
-      status.textContent = "Consultando a Lume...";
-      answer.textContent = "";
-      var suggestions = document.getElementById("lume-suggestions");
-      if (suggestions) {
-        suggestions.innerHTML = "";
-        suggestions.hidden = true;
-      }
+      setMascotUp(true);
+      showLumeLoading(statusEl, answerEl);
+      if (suggestionsEl) { suggestionsEl.innerHTML = ""; suggestionsEl.hidden = true; }
 
-      fetch(c.apiBase + "/lume/query", {
+      var history = getHistory();
+      var buffer = "";
+
+      fetch(c.apiBase + "/lume/stream", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query: query, "scenario": "home" }),
+        headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+        body: JSON.stringify({ query: query, scenario: "home", history: history }),
       })
-        .then(function (r) {
-          return r.json().then(function (data) {
-            if (!r.ok) {
-              var msg = (data && data.error && (data.error.message || data.error.detail))
-                || (data && data.detail)
-                || ("Erro " + r.status);
-              throw new Error(msg);
-            }
-            return data;
-          });
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Erro " + response.status);
+          }
+
+          statusEl.textContent = "Resposta da Lume";
+          answerEl.innerHTML = "";
+
+          var reader = response.body.getReader();
+          var decoder = new TextDecoder();
+          var partial = "";
+
+          function readChunk() {
+            return reader.read().then(function (result) {
+              if (result.done) {
+                // Renderiza markdown completo no final
+                if (buffer) answerEl.innerHTML = renderMarkdown(buffer);
+                setMascotUp(false);
+                return;
+              }
+
+              partial += decoder.decode(result.value, { stream: true });
+              var lines = partial.split("\n");
+              partial = lines.pop() || ""; // mantém linha incompleta
+
+              lines.forEach(function (line) {
+                line = line.trim();
+                if (!line.startsWith("data:")) return;
+                var payload = line.slice(5).trim();
+                if (!payload) return;
+
+                try {
+                  var obj = JSON.parse(payload);
+
+                  if (obj.done) {
+                    // Evento final com metadados
+                    answerEl.innerHTML = renderMarkdown(buffer);
+                    statusEl.textContent = obj.low_confidence
+                      ? "A Lume encontrou pouca correspondência. Use como orientação inicial."
+                      : "Resposta da Lume";
+                    statusEl.classList.toggle("is-low-confidence", !!obj.low_confidence);
+                    renderLumeResult(
+                      { answer: buffer, low_confidence: obj.low_confidence, suggested_pills: obj.suggested_pills || [], suggested_questions: obj.suggested_questions || [] },
+                      statusEl,
+                      answerEl,
+                      suggestionsEl,
+                    );
+                    // Salva na memória de conversa
+                    addToHistory("user", query);
+                    addToHistory("assistant", buffer);
+                    setMascotUp(false);
+                  } else if (obj.text) {
+                    buffer += obj.text;
+                    // Mostra texto cru enquanto streama (rápido)
+                    answerEl.textContent = buffer;
+                  }
+                } catch (e) { /* linha mal formada, ignora */ }
+              });
+
+              return readChunk();
+            });
+          }
+
+          return readChunk();
         })
-        .then(renderLumeResult)
         .catch(function (err) {
-          status.textContent = "Não consegui consultar a Lume agora.";
-          answer.textContent = err && err.message ? err.message : "Tente novamente em instantes.";
+          statusEl.textContent = "Não consegui consultar a Lume agora.";
+          answerEl.textContent = err && err.message ? err.message : "Tente novamente em instantes.";
+          setMascotUp(false);
         });
     });
   }
 
-  /* ── Bootstrap ───────────────────────────────────────────────────── */
+  /* ── Bootstrap ───────────────────────────────────────────── */
   function boot() {
     var c = cfg();
+
+    // Carrega marked.js antes de tudo
+    if (typeof window.marked === "undefined") {
+      var script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/marked@12/marked.min.js";
+      document.head.appendChild(script);
+    }
+
     initQuickAccess();
     wireDomainFilters();
     bindLumeSearch();
+
     if (c && c.apiBase) {
       fetchTrending(c.apiBase);
       fetchDomainCategories(c.apiBase);

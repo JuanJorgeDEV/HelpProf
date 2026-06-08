@@ -185,10 +185,18 @@ class DomainGuideUpdateIn(BaseModel):
     slides_embed: str | None = None
 
 
+class HistoryMessage(BaseModel):
+    """Mensagem do histórico de conversa enviada pelo frontend."""
+    role: Literal["user", "assistant"]
+    content: str = Field(..., min_length=1, max_length=4000)
+
+
 class LumeQueryIn(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
     scenario: Literal["home", "pill"] = "home"
     pill_id: UUID | None = None
+    # Últimas trocas do chat (máx 6 mensagens = 3 pares user/assistant)
+    history: list[HistoryMessage] = Field(default_factory=list, max_length=6)
 
     @model_validator(mode="after")
     def pill_id_required_when_pill_context(self):
