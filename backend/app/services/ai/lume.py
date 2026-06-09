@@ -130,7 +130,7 @@ def _generate_lume(prompt: str) -> str:
                 if attempt == 0:
                     time.sleep(0.8)
 
-    raise ServiceUnavailableError("A Lume não conseguiu gerar a resposta agora.") from last_exc
+    raise ServiceUnavailableError("Opa! Tive um probleminha para gerar a resposta completa agora. Tente de novo em instantes.") from last_exc
 
 
 def _fetch_pill_row(pill_id: UUID) -> dict:
@@ -418,7 +418,7 @@ def stream_lume(payload: LumeQueryIn) -> Generator[str, None, None]:
                 time.sleep(0.5)
                 continue
             # Ambas as configs falharam
-            yield f"data: {json.dumps({'text': 'A Lume não conseguiu gerar a resposta agora. Tente novamente em instantes.'})}\n\n"
+            yield f"data: {json.dumps({'text': '\\n\\n*Ops! A conexão com a Lume falhou e a resposta foi interrompida. Que tal tentar novamente em instantes?*'})}\n\n"
 
     if last_exc and not streamed_any:
         log.error("stream_lume: todas as configs falharam: %s", last_exc)

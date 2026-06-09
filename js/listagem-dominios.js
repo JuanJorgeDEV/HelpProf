@@ -28,8 +28,8 @@
     var color = cat.brand_color || "#6366f1";
     var brand = typeof window.resolveToolBrand === "function"
       ? window.resolveToolBrand(cat)
-      : { logo: cat.logo_url || "Logo.jpeg", color: color, label: name };
-    var logo = brand.logo || "Logo.jpeg";
+      : { logo: cat.logo_url || "assets/Logo.jpeg", color: color, label: name };
+    var logo = brand.logo || "assets/Logo.jpeg";
     color = brand.color || color;
     name = brand.label || name;
 
@@ -50,7 +50,7 @@
     iconWrap.setAttribute("aria-hidden", "true");
     iconWrap.style.background = hexAlpha(color, 0.12);
 
-    if (logo && logo !== "Logo.jpeg") {
+    if (logo && logo !== "assets/Logo.jpeg") {
       var img = document.createElement("img");
       img.src = logo;
       img.alt = "";

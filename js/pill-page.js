@@ -138,7 +138,7 @@
     bar.style.borderLeftColor = color;
     bar.style.borderColor = hexAlpha(color, 0.28);
     bar.style.borderLeftColor = color;
-    if (logoEl) { logoEl.src = brand.logo || "Logo.jpeg"; logoEl.alt = brand.label || ""; }
+    if (logoEl) { logoEl.src = brand.logo || "assets/Logo.jpeg"; logoEl.alt = brand.label || ""; }
     if (lbl) lbl.textContent = brand.label || "";
     document.documentElement.style.setProperty("--pill-brand-accent", color);
   }
@@ -155,7 +155,7 @@
     function fromStatic() {
       var b = typeof window.resolveToolBrand === "function"
         ? window.resolveToolBrand(slug)
-        : { logo: "Logo.jpeg", color: "#6366f1", label: slug };
+        : { logo: "assets/Logo.jpeg", color: "#6366f1", label: slug };
       doApplyBrand(b);
     }
 
@@ -226,11 +226,16 @@
     var result = qs("pill-lume-result");
     var status = qs("pill-lume-status");
     var answer = qs("pill-lume-answer");
+    var mascot = qs("lume-mascot");
     if (!result || !status || !answer) return;
     result.hidden = false;
     status.textContent = data.low_confidence ? "Resposta com baixa confiança" : "Resposta da Lume";
     status.classList.toggle("is-low-confidence", !!data.low_confidence);
     answer.innerHTML = renderMarkdown(data.answer || "");
+    if (mascot) {
+      var srcDown = mascot.getAttribute("data-src-down") || "assets/Mao abaixada.png";
+      mascot.src = srcDown;
+    }
   }
 
   function bindPillLume(cfg) {
@@ -258,8 +263,23 @@
       }
 
       result.hidden = false;
-      status.textContent = "Consultando a Lume...";
-      answer.textContent = "";
+      status.innerHTML =
+        'Lume está pensando... <span class="lume-thinking" aria-label="Consultando a Lume">' +
+        '<span class="lume-thinking__dot"></span>' +
+        '<span class="lume-thinking__dot"></span>' +
+        '<span class="lume-thinking__dot"></span>' +
+        '</span>';
+      answer.innerHTML =
+        '<div class="lume-skeleton-line" style="width:88%"></div>' +
+        '<div class="lume-skeleton-line" style="width:72%"></div>' +
+        '<div class="lume-skeleton-line" style="width:82%"></div>' +
+        '<div class="lume-skeleton-line" style="width:55%"></div>';
+
+      var mascot = qs("lume-mascot");
+      if (mascot) {
+        var srcUp = mascot.getAttribute("data-src-up") || "assets/Mao levantada.png";
+        mascot.src = srcUp;
+      }
 
       fetch(cfg.apiBase + "/lume/query", {
         method: "POST",
@@ -279,8 +299,12 @@
         })
         .then(renderPillLumeResult)
         .catch(function (err) {
-          status.textContent = "Não consegui consultar a Lume agora.";
-          answer.textContent = err && err.message ? err.message : "Tente novamente em instantes.";
+          status.textContent = "Ops! Ocorreu um contratempo.";
+          answer.innerHTML = renderMarkdown(err && err.message ? err.message : "*Não consegui me conectar com a Lume agora. Que tal tentar de novo em instantes?*");
+          if (mascot) {
+            var srcDown = mascot.getAttribute("data-src-down") || "assets/Mao abaixada.png";
+            mascot.src = srcDown;
+          }
         });
     });
   }
@@ -289,7 +313,7 @@
   function buildRelatedCard(pill) {
     var brand = typeof window.resolveToolBrand === "function"
       ? window.resolveToolBrand((pill.tool_category || "").toUpperCase())
-      : { logo: "Logo.jpeg", color: "#6366f1", label: pill.tool_category || "" };
+      : { logo: "assets/Logo.jpeg", color: "#6366f1", label: pill.tool_category || "" };
 
     var li = document.createElement("li");
     li.className = "pill-carousel__slide pill-carousel__slide--related";
@@ -303,7 +327,7 @@
     var iconDiv = document.createElement("div");
     iconDiv.className = "pill-card__icon";
     iconDiv.setAttribute("aria-hidden", "true");
-    if (brand.logo && brand.logo !== "Logo.jpeg") {
+    if (brand.logo && brand.logo !== "assets/Logo.jpeg") {
       var img = document.createElement("img");
       img.src = brand.logo;
       img.alt = brand.label || pill.tool_category || "";

@@ -33,7 +33,7 @@ window.upsertToolBrand = function upsertToolBrand(category) {
   var slug = String(category.slug || "").trim();
   var staticBrand = readStaticToolAsset(slug) || {};
   var brand = {
-    logo: category.logo_url || staticBrand.logo || "Logo.jpeg",
+    logo: category.logo_url || staticBrand.logo || "assets/Logo.jpeg",
     color: category.brand_color || staticBrand.color || "#6366f1",
     label: category.name || staticBrand.label || slug.toUpperCase(),
   };
@@ -51,7 +51,7 @@ window.resolveToolBrand = function resolveToolBrand(key) {
     var slugFromCategory = category.slug || category.tool_category || category.name || "";
     var categoryStatic = readStaticToolAsset(slugFromCategory) || {};
     return {
-      logo: category.logo_url || categoryStatic.logo || "Logo.jpeg",
+      logo: category.logo_url || categoryStatic.logo || "assets/Logo.jpeg",
       color: category.brand_color || categoryStatic.color || "#6366f1",
       label: category.name || categoryStatic.label || String(slugFromCategory || "HelpProf").toUpperCase(),
     };
@@ -60,7 +60,7 @@ window.resolveToolBrand = function resolveToolBrand(key) {
   var asset = readStaticToolAsset(k);
   if (asset) return asset;
   return {
-    logo: "Logo.jpeg",
+    logo: "assets/Logo.jpeg",
     color: "#6366f1",
     label: k ? k.toUpperCase() : "HelpProf",
   };

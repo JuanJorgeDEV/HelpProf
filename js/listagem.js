@@ -187,7 +187,7 @@
     var brand =
       typeof window.resolveToolBrand === "function"
         ? window.resolveToolBrand((pill.tool_category || "").toUpperCase())
-        : { logo: "Logo.jpeg", color: "#6366f1", label: pill.tool_category || "" };
+        : { logo: "assets/Logo.jpeg", color: "#6366f1", label: pill.tool_category || "" };
     var li = document.createElement("li");
     li.className = "listing-grid__item";
 
@@ -200,7 +200,7 @@
     var iconDiv = document.createElement("div");
     iconDiv.className = "pill-card__icon";
     iconDiv.setAttribute("aria-hidden", "true");
-    if (brand.logo && brand.logo !== "Logo.jpeg") {
+    if (brand.logo && brand.logo !== "assets/Logo.jpeg") {
       var img = document.createElement("img");
       img.src = brand.logo;
       img.alt = brand.label || pill.tool_category || "";

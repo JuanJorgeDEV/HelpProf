@@ -59,7 +59,7 @@
   function showLumeLoading(statusEl, answerEl) {
     if (statusEl) {
       statusEl.innerHTML =
-        '<span class="lume-thinking" aria-label="Consultando a Lume">' +
+        'Lume está pensando... <span class="lume-thinking" aria-label="Consultando a Lume">' +
         '<span class="lume-thinking__dot"></span>' +
         '<span class="lume-thinking__dot"></span>' +
         '<span class="lume-thinking__dot"></span>' +
@@ -89,7 +89,7 @@
       }
       if (!slug || typeof window.resolveToolBrand !== "function") return;
       var brand = window.resolveToolBrand(slug);
-      if (!brand.logo || brand.logo === "Logo.jpeg") return;
+      if (!brand.logo || brand.logo === "assets/Logo.jpeg") return;
       var glyph = btn.querySelector(".quick-access-btn__glyph");
       if (!glyph) return;
       var img = document.createElement("img");
@@ -107,7 +107,7 @@
   function buildCard(pill) {
     var brand = typeof window.resolveToolBrand === "function"
       ? window.resolveToolBrand((pill.tool_category || "").toUpperCase())
-      : { logo: "Logo.jpeg", color: "#6366f1", label: pill.tool_category || "" };
+      : { logo: "assets/Logo.jpeg", color: "#6366f1", label: pill.tool_category || "" };
 
     var li = document.createElement("li");
     li.className = "pill-carousel__slide";
@@ -121,7 +121,7 @@
     var iconDiv = document.createElement("div");
     iconDiv.className = "pill-card__icon";
     iconDiv.setAttribute("aria-hidden", "true");
-    if (brand.logo && brand.logo !== "Logo.jpeg") {
+    if (brand.logo && brand.logo !== "assets/Logo.jpeg") {
       var img = document.createElement("img");
       img.src = brand.logo;
       img.alt = brand.label || pill.tool_category || "";
@@ -172,9 +172,9 @@
     var slug = String(cat.slug || "").toUpperCase();
     var brand = typeof window.resolveToolBrand === "function"
       ? window.resolveToolBrand(cat)
-      : { logo: "Logo.jpeg", color: "#6366f1", label: cat.name || slug };
+      : { logo: "assets/Logo.jpeg", color: "#6366f1", label: cat.name || slug };
     return {
-      logo: brand.logo || "Logo.jpeg",
+      logo: brand.logo || "assets/Logo.jpeg",
       color: brand.color || "#6366f1",
       label: brand.label || cat.name || String(cat.slug || "").toUpperCase(),
     };
@@ -199,7 +199,7 @@
     logoWrap.className = "home-domain-card__logo";
     logoWrap.style.background = hexAlpha(brand.color, 0.12);
 
-    if (brand.logo && brand.logo !== "Logo.jpeg") {
+    if (brand.logo && brand.logo !== "assets/Logo.jpeg") {
       var img = document.createElement("img");
       img.src = brand.logo;
       img.alt = "";
@@ -452,7 +452,7 @@
             throw new Error("Erro " + response.status);
           }
 
-          statusEl.textContent = "Resposta da Lume";
+          statusEl.textContent = "Lume está escrevendo...";
           answerEl.innerHTML = "";
 
           var reader = response.body.getReader();
@@ -513,11 +513,23 @@
           return readChunk();
         })
         .catch(function (err) {
-          statusEl.textContent = "Não consegui consultar a Lume agora.";
-          answerEl.textContent = err && err.message ? err.message : "Tente novamente em instantes.";
+          statusEl.textContent = "Ops! Ocorreu um contratempo.";
+          answerEl.innerHTML = renderMarkdown(err && err.message ? err.message : "*Não consegui me conectar com a Lume agora. Que tal tentar de novo em instantes?*");
           setMascotUp(false);
         });
     });
+  }
+
+  function fetchAllCategories(apiBase) {
+    return fetch(apiBase + "/categories?limit=500", { headers: { Accept: "application/json" } })
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (rows) {
+        var categories = Array.isArray(rows) ? rows : [];
+        if (typeof window.upsertToolBrand === "function") {
+          categories.forEach(function (cat) { window.upsertToolBrand(cat); });
+        }
+      })
+      .catch(function () {});
   }
 
   /* ── Bootstrap ───────────────────────────────────────────── */
@@ -536,8 +548,10 @@
     bindLumeSearch();
 
     if (c && c.apiBase) {
-      fetchTrending(c.apiBase);
-      fetchDomainCategories(c.apiBase);
+      fetchAllCategories(c.apiBase).then(function () {
+        fetchTrending(c.apiBase);
+        fetchDomainCategories(c.apiBase);
+      });
     } else {
       renderCarousel([]);
       renderDomainError();

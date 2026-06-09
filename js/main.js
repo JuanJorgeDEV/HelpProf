@@ -119,9 +119,9 @@
   var srcDown =
     (lumeImg && lumeImg.getAttribute("data-src-down")) ||
     (lumeImg && lumeImg.getAttribute("src")) ||
-    "mao-abaixada.png";
+    "assets/Mao abaixada.png";
   var srcUp =
-    (lumeImg && lumeImg.getAttribute("data-src-up")) || "mao-levantada.png";
+    (lumeImg && lumeImg.getAttribute("data-src-up")) || "assets/Mao levantada.png";
 
   function lumeActivate() {
     if (!lumeImg) return;
